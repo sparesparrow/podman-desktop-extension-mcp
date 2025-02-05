@@ -1,0 +1,23 @@
+{
+  "name": "helloworld",
+  "displayName": "Hello World",
+  "description": "Hello World extension",
+  "version": "0.0.1",
+  "icon": "icon.png",
+  "publisher": "you",
+  "license": "Apache-2.0",
+  "engines": {
+    "podman-desktop": ">=1.10.0"
+  },
+  "main": "./dist/extension.js",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch"
+  },
+  "devDependencies": {
+    "@podman-desktop/api": "1.16.1",
+    "@types/node": "^22",
+    "typescript": "5.7.3"
+  },
+  "packageManager": "npm@11.0.0+sha512.11dff29565d2297c74e7c594a9762581bde969f0aa5cbe6f5b3644bf008a16c065ece61094d9ffbb81125be38df8e1ba43eb8244b3d30c61eb797e9a2440e3ec"
+}
