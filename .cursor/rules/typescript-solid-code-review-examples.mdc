@@ -1,0 +1,157 @@
+---
+description: Examples of SOLID principles analysis and refactoring rules for TypeScript code reviews
+globs: ["src/**/*.ts", "src/**/*.tsx"]
+---
+
+# TypeScript SOLID Code Review Rules - Examples
+
+## Analysis Requirements
+
+1. Evaluate code against SOLID principles:
+```typescript
+interface SOLIDAnalysis {
+  violations: {
+    SRP: ClassResponsibility[];
+    OCP: ExtensionPoint[];
+    LSP: SubstitutionIssue[];
+    ISP: InterfaceBlob[];
+    DIP: ConcreteDependency[];
+  };
+  issues: CodeSmell[];
+}
+
+type ClassResponsibility = {
+  className: string;
+  multipleResponsibilities: string[];
+};
+
+type ExtensionPoint = {
+  component: string;
+  modificationRequiredFor: string;
+};
+```
+
+2. Code review must include:
+- Mermaid flowchart showing SOLID violations
+- Class diagram of proposed structure
+- TypeScript-specific refactoring plan
+
+## SOLID Enforcement
+
+### Single Responsibility Principle
+```typescript
+// Bad
+class UserManager {
+  // Handles authentication, storage, and notifications
+  async handleUserUpdate() {
+    // 200+ lines combining multiple concerns
+  }
+}
+
+// Good
+class UserAuthenticator { /* ... */ }
+class UserStorage { /* ... */ }
+class UserNotifier { /* ... */ }
+```
+
+### Open/Closed Principle
+```typescript
+// Bad
+class PaymentProcessor {
+  process(type: string) {
+    if (type === 'paypal') { /* ... */ }
+    if (type === 'stripe') { /* ... */ }
+  }
+}
+
+// Good
+interface PaymentHandler {
+  process(): void;
+}
+class PayPalHandler implements PaymentHandler {}
+class StripeHandler implements PaymentHandler {}
+```
+
+### Liskov Substitution
+```typescript
+// Bad
+class Bird {
+  fly() { /* ... */ }
+}
+class Penguin extends Bird {} // Violates LSP
+
+// Good
+interface FlyingCreature { fly(): void; }
+interface SwimmingCreature { swim(): void; }
+class Penguin implements SwimmingCreature {}
+```
+
+## Refactoring Process
+
+1. Create analysis flowchart:
+```mermaid
+graph TD
+    SOLID --> SRP
+    SOLID --> OCP
+    SOLID --> LSP
+    SOLID --> ISP
+    SOLID --> DIP
+    
+    SRP -->|Multiple Responsibilities| SRP_V1
+    OCP -->|Modification Required| OCP_V1
+    LSP -->|Invalid Substitution| LSP_V1
+    ISP -->|Fat Interfaces| ISP_V1
+    DIP -->|Concrete Dependencies| DIP_V1
+    
+    classDef violation fill:#ffebee,stroke:#c62828
+    class SRP_V1,OCP_V1,LSP_V1,ISP_V1,DIP_V1 violation
+```
+
+2. Propose class structure:
+```mermaid
+classDiagram
+    class UserAuthenticator
+    class UserStorage
+    class UserNotifier
+    class PaymentHandler {
+        <<interface>>
+        process()
+    }
+    
+    UserAuthenticator --> UserStorage
+    PayPalHandler ..|> PaymentHandler
+    StripeHandler ..|> PaymentHandler
+```
+
+## Code Improvements
+
+1. Required refactoring patterns:
+```typescript
+// Before
+class MonsterService {
+  // Handles API calls, data parsing, and caching
+}
+
+// After
+class ApiClient { /* ... */ }
+class DataParser { /* ... */ }
+class CacheManager { /* ... */ }
+```
+
+## Documentation Requirements
+
+1. Include SOLID analysis in code reviews:
+- Violation explanations with code snippets
+- Proposed architecture diagrams
+- TypeScript-specific refactoring steps
+- Alternative naming suggestions
+
+## Implementation Rules
+
+1. All SOLID reviews must:
+- Analyze one component at a time
+- Keep refactoring scopes < 200 lines
+- Maintain TypeScript type safety
+- Preserve existing functionality
+- Update tests and documentation
+```

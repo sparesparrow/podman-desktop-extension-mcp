@@ -1,96 +1,116 @@
-# Podman Desktop Extension Minimal Template
+# MCP Server Manager Extension for Podman Desktop
 
-<p align="center">
-  <img alt="Hello World" src="/images/helloselkie.png" width="50%">
-</p>
+A Podman Desktop extension for managing Model Context Protocol (MCP) servers. This extension allows you to easily start, stop, and monitor MCP servers using Podman containers.
 
-## Overview
+## Features
 
-This template provides a minimal template on how to build a Podman Desktop extension. More information can be found on our [official extension documentation](https://podman-desktop.io/docs/extensions) on how to further expand your extension.
+- Start MCP servers with configurable options
+- Stop running MCP servers
+- Check server status
+- List all running MCP servers
+- Monitor server health
+- Support for standard MCP capabilities (resources, tools, prompts, logging)
 
-With this template, on activating a "Hello World!" dialog will appear.
+## Requirements
+
+- Podman Desktop >= 1.10.0
+- Podman installed and configured on your system
+- Node.js >= 16.x
+- pnpm >= 8.x
+
+## Installation
+
+1. Clone the repository:
+```bash
+git clone https://github.com/sparesparrow/mcp-server-manager-extension.git
+cd mcp-server-manager-extension
+```
+
+2. Install dependencies:
+```bash
+pnpm install
+```
+
+3. Build the extension:
+```bash
+pnpm run build
+```
+
+4. Install the extension in Podman Desktop:
+   - Open Podman Desktop
+   - Go to Settings > Extensions
+   - Click "Install from Directory"
+   - Select the built extension directory
+
+## Usage
+
+The extension adds the following commands to Podman Desktop:
+
+- `MCP: Start Server` - Start a new MCP server
+- `MCP: Stop Server` - Stop a running MCP server
+- `MCP: Get Status` - Check the status of an MCP server
+- `MCP: List Servers` - List all running MCP servers
+
+You can access these commands through the Podman Desktop command palette (Ctrl/Cmd + Shift + P).
+
+### Configuration
+
+The default MCP server configuration:
+
+```typescript
+{
+  name: 'mcp-server',
+  image: 'ghcr.io/sparesparrow/mcp-server-manager-extension:latest',
+  port: 3000,
+  capabilities: {
+    resources: true,
+    tools: true,
+    prompts: true,
+    logging: true
+  }
+}
+```
 
 ## Development
 
-To build and develop the extension, follow these steps:
+1. Clone the repository
+2. Install dependencies: `pnpm install`
+3. Build the extension: `pnpm run build`
+4. Watch for changes: `pnpm run watch`
 
-1. Clone the project or your fork:
-```sh
-$ git clone https://github.com/containers/podman-desktop-extension-minimal-template/
+### Testing
+
+Run the test suite:
+
+```bash
+pnpm test
 ```
 
-2. Run `npm install` to install all relevant packages:
-```sh
-$ npm install
+### Linting
+
+Check code style:
+
+```bash
+pnpm run lint
 ```
 
-3. Create a build:
+## Contributing
 
-Creating a build will generate all required files for Podman Desktop to load the extension:
+1. Fork the repository
+2. Create your feature branch: `git checkout -b feature/my-new-feature`
+3. Commit your changes: `git commit -am 'Add some feature'`
+4. Push to the branch: `git push origin feature/my-new-feature`
+5. Submit a pull request
 
-```sh
-$ npm run build
-```
-Optionally, you can also use `npm run watch` to continuously rebuild after each change, without needing to re-run `npm run build`:
+## License
 
-```sh
-$ npm run watch
-```
+Apache-2.0 - see [LICENSE](LICENSE) for details.
 
-4. Load the extension temporarily within Podman Desktop:
+## Related
 
-We will load the extension within Podman Desktop to test it. This requires cloning the [Podman Desktop repo](https://github.com/containers/podman-desktop):
+- [Model Context Protocol (MCP) Specification](https://modelcontextprotocol.io)
+- [Podman Desktop](https://podman-desktop.io)
+- [MCP Servers Repository](https://github.com/sparesparrow/mcp-servers)
 
-```sh
-$ git clone https://github.com/containers/podman-desktop
-```
 
-Navigate to the directory:
-
-```sh
-$ cd podman-desktop
-```
-
-Run the `npm install` command:
-
-```sh
-$ npm install
-```
-
-Load the extension using the `npm run watch` command with an additional parameter to load the `backend` packaged data:
-
-```sh
-npm run watch --extension-folder ../podman-desktop-extension-minimal-template
-```
-
-5. Confirm that the extension has been loaded:
-
-You can now see that your extension has been loaded by checking the **Extensions** section of Podman Desktop:
-
-![loaded](/images/loaded.png)
-
-A "Hello World" dialog will also appear on each activation:
-
-![helloworld notification](/images/helloworld_notification.png)
-
-## Packaging and Publishing
-
-More information on how to package and publish your extension can be found in our [official publishing documentation](https://podman-desktop.io/docs/extensions/publish).
-
-However, we have provided a pre-made Containerfile in this template for you to try.
-
-1. Package your extension by building the image:
-
-```sh
-$ podman build -t quay.io/myusername/myextension .
-```
-
-2. Push the extension to an external registry:
-
-```sh
-$ podman push quay.io/myusername/myextension
-```
-
-3. Install via the Podman Desktop "Install Custom..." button:
-
-![custom install](/images/custom_install.png)
+![MCP Server Manager Extension](/images/5c0c0e9fe4def0b584c04d37849941da55e5e71c-2401x1000.webp)

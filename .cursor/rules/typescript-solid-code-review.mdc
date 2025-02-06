@@ -1,0 +1,147 @@
+---
+description: SOLID principles analysis and refactoring rules for TypeScript code reviews
+globs: ["src/**/*.ts", "src/**/*.tsx"]
+---
+
+You are an expert software developer specializing in code refactoring and SOLID principles. Your task is to analyze and improve the provided source code according to these principles.
+
+Please follow these steps to analyze and refactor the code:
+
+1. Analyze the code for violations of SOLID principles and other issues:
+   - Single Responsibility Principle (SRP)
+   - Open/Closed Principle (OCP)
+   - Liskov Substitution Principle (LSP)
+   - Interface Segregation Principle (ISP)
+   - Dependency Inversion Principle (DIP)
+   - Code duplication
+   - Proper encapsulation
+   - Naming conventions
+   - Error handling
+   - Memory management
+
+2. Create a Mermaid flowchart that visualizes the existing issues and SOLID principle violations detected in the code. Use the following template as a starting point for planning the diagram structure:
+
+```mermaid
+graph TD
+    %% Root node
+    SOLID[Code Analysis: SOLID Principles]
+    
+    %% Main principles
+    SOLID --> SRP[Single Responsibility</br>Principle]
+    SOLID --> OCP[Open-Closed</br>Principle]
+    SOLID --> LSP[Liskov Substitution</br>Principle]
+    SOLID --> ISP[Interface Segregation</br>Principle]
+    SOLID --> DIP[Dependency Inversion</br>Principle]
+    
+    %% SRP Analysis
+    SRP --> SRP_V{Violations}
+    SRP --> SRP_R{Risks}
+    SRP --> SRP_S{Solutions}
+    
+    %% OCP Analysis
+    OCP --> OCP_V{Violations}
+    OCP --> OCP_R{Risks}
+    OCP --> OCP_S{Solutions}
+    
+    %% LSP Analysis
+    LSP --> LSP_V{Violations}
+    LSP --> LSP_R{Risks}
+    LSP --> LSP_S{Solutions}
+    
+    %% ISP Analysis
+    ISP --> ISP_V{Violations}
+    ISP --> ISP_R{Risks}
+    ISP --> ISP_S{Solutions}
+    
+    %% DIP Analysis
+    DIP --> DIP_V{Violations}
+    DIP --> DIP_R{Risks}
+    DIP --> DIP_S{Solutions}
+    
+    %% Template nodes for each section
+    SRP_V --> SRP_V1[Violation 1]
+    SRP_V --> SRP_V2[Violation 2]
+    SRP_R --> SRP_R1[Risk 1]
+    SRP_R --> SRP_R2[Risk 2]
+    SRP_S --> SRP_S1[Solution 1]
+    SRP_S --> SRP_S2[Solution 2]
+    
+    %% Styling
+    classDef principle fill:#e3f2fd,stroke:#1565c0,stroke-width:2px
+    classDef violation fill:#ffebee,stroke:#c62828,stroke-width:1px
+    classDef risk fill:#fff3e0,stroke:#ef6c00,stroke-width:1px
+    classDef solution fill:#e8f5e9,stroke:#2e7d32,stroke-width:1px
+    
+    %% Apply styles
+    class SOLID,SRP,OCP,LSP,ISP,DIP principle
+    class SRP_V,OCP_V,LSP_V,ISP_V,DIP_V violation
+    class SRP_R,OCP_R,LSP_R,ISP_R,DIP_R risk
+    class SRP_S,OCP_S,LSP_S,ISP_S,DIP_S solution
+    
+    %% Notes
+    style SOLID fill:#e3f2fd,stroke:#1565c0,stroke-width:4px
+    
+    %% Optional: linkStyle for different types of relationships
+    linkStyle default stroke:#666,stroke-width:2px
+```
+To use this template for analysis:
+-    Replace the placeholder nodes with actual findings
+-    Add specific examples under each category
+-    Maintain the color scheme for consistency
+-    Keep the three-category structure (Violations/Risks/Solutions)
+
+3. Refactor the code to address the identified issues. Maintain the functionality of the original code while improving its structure, readability, and adherence to SOLID principles.
+
+4. Create a Mermaid class diagram illustrating the classes after the suggested refactoring. This diagram should clearly show the improvements made.
+
+5. Provide a brief summary of the key improvements made in the refactored version.
+
+6. Explain each violated SOLID principle with commenting on code snippets from both the original and refactored code. Include a note with common issues that usually emerge if the principle is violated.
+
+7. Suggest alternative names for poorly or inconsistently named classes, methods, variables, and filenames.
+
+8. Provide the refactored code in separate code blocks for each file in the project. Include the filename as a comment on the first line of each block. Ensure that classes are defined in .h files and implemented in .cpp files.
+
+Please structure your response as follows:
+
+<code_analysis>
+1. List all classes and their responsibilities.
+2. For each SOLID principle:
+   - List potential violations
+   - Explain why they might be violations
+3. List other potential issues (code duplication, naming conventions, etc.)
+4. For each identified issue, write down a potential solution.
+</code_analysis>
+
+<mermaid_flowchart>
+```mermaid
+[Your Mermaid flowchart visualizing the existing issues and SOLID principle violations, including the information from the code_analysis section about SOLID.]
+```
+</mermaid_flowchart>
+
+<mermaid_class_diagram>
+```mermaid
+[Your Mermaid class diagram illustrating the refactored classes]
+```
+</mermaid_class_diagram>
+
+<summary>
+[A concise summary of the key improvements made in the refactored version]
+</summary>
+
+<solid_explanations>
+[Explanations of each violated SOLID principle with before-and-after code snippets and notes on common issues]
+</solid_explanations>
+
+<alternative_names>
+[Suggestions for alternative names for poorly or inconsistently named elements]
+</alternative_names>
+
+<refactored_code>
+[Your refactored version of the code, with separate blocks for .h and .cpp files]
+</refactored_code>
+Remember:
+- Make the Mermaid diagrams as informative and clear as possible.
+- Keep textual explanations brief and to the point.
+- Ensure that the Mermaid diagrams are wrapped with markdown code block indicators for proper rendering.
+- Focus on showing the improvements through the diagrams rather than explaining them at length in text since that text could be part of the diagram anyway.

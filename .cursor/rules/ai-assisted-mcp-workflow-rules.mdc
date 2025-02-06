@@ -1,0 +1,247 @@
+---
+description: Guidelines for AI-assisted MCP development workflows and best practices
+globs: ["src/**/*.{ts,js,tsx,jsx}"]
+---
+
+# AI-Assisted MCP Development Workflow Rules
+
+## Development Session Setup
+
+1. Environment Preparation:
+```typescript
+// Required setup for AI-assisted development
+interface DevelopmentSession {
+  // 1. Core files that should be open
+  requiredContext: {
+    implementation: string[];  // Core implementation files
+    types: string[];          // Type definition files
+    tests: string[];          // Test files
+  };
+
+  // 2. Development tools configuration
+  tooling: {
+    typescript: boolean;      // TypeScript support
+    testing: boolean;         // Test framework
+    linting: boolean;         // Linter configuration
+  };
+}
+```
+
+## MCP Feature Development Process
+
+1. Feature Planning:
+```typescript
+// Template for planning MCP features
+interface FeaturePlan {
+  // 1. Feature definition
+  definition: {
+    name: string;
+    description: string;
+    capabilities: string[];
+  };
+
+  // 2. Implementation requirements
+  requirements: {
+    apis: string[];          // Required MCP APIs
+    dependencies: string[];  // External dependencies
+    testing: string[];      // Test requirements
+  };
+}
+```
+
+2. Implementation Workflow:
+```typescript
+// Standard implementation process
+class FeatureImplementation {
+  // 1. Setup phase
+  async setupFeature() {
+    // Initialize feature structure
+    await this.createFeatureFiles();
+    await this.setupTests();
+  }
+
+  // 2. Development phase
+  async developFeature() {
+    // Implement core functionality
+    await this.implementCapabilities();
+    await this.implementHandlers();
+    await this.implementTests();
+  }
+
+  // 3. Validation phase
+  async validateFeature() {
+    // Verify implementation
+    await this.runTests();
+    await this.validateTypes();
+    await this.checkCodeCoverage();
+  }
+}
+```
+
+## AI Assistant Integration
+
+1. Code Generation Guidelines:
+```typescript
+// Pattern for AI-assisted code generation
+interface CodeGenerationRequest {
+  // 1. Context requirements
+  context: {
+    files: string[];        // Required source files
+    patterns: string[];     // Implementation patterns
+  };
+
+  // 2. Generation parameters
+  parameters: {
+    feature: string;        // Feature name
+    capabilities: string[]; // Required capabilities
+    testing: boolean;      // Include tests
+  };
+}
+```
+
+2. Code Review Process:
+```typescript
+// AI-assisted code review checklist
+interface CodeReview {
+  // 1. Static analysis
+  staticChecks: {
+    types: boolean;         // Type safety
+    patterns: boolean;      // Pattern adherence
+    security: boolean;      // Security checks
+  };
+
+  // 2. Dynamic analysis
+  dynamicChecks: {
+    tests: boolean;         // Test coverage
+    performance: boolean;   // Performance metrics
+  };
+}
+```
+
+## MCP Server Integration
+
+1. Server Feature Integration:
+```typescript
+// Pattern for integrating new features
+class McpFeatureIntegration {
+  // 1. Feature registration
+  async registerFeature(feature: McpFeature) {
+    // Validate feature
+    await this.validateFeature(feature);
+
+    // Register with server
+    await this.server.registerFeature(feature);
+
+    // Setup monitoring
+    await this.setupFeatureMonitoring(feature);
+  }
+
+  // 2. Feature lifecycle management
+  async manageFeatureLifecycle(feature: McpFeature) {
+    // Initialize feature
+    await this.initializeFeature(feature);
+
+    // Monitor health
+    await this.monitorFeatureHealth(feature);
+
+    // Handle updates
+    await this.handleFeatureUpdates(feature);
+  }
+}
+```
+
+## Testing and Validation
+
+1. Test Implementation Rules:
+```typescript
+// Required test patterns for MCP features
+class McpFeatureTests {
+  // 1. Unit tests
+  async testFeatureUnit() {
+    // Test individual components
+    await this.testCapabilities();
+    await this.testHandlers();
+    await this.testErrorHandling();
+  }
+
+  // 2. Integration tests
+  async testFeatureIntegration() {
+    // Test feature integration
+    await this.testServerIntegration();
+    await this.testClientInteraction();
+    await this.testErrorPropagation();
+  }
+}
+```
+
+## Documentation Requirements
+
+1. Documentation Structure:
+```typescript
+// Required documentation components
+interface FeatureDocumentation {
+  // 1. API documentation
+  api: {
+    endpoints: string[];    // Available endpoints
+    parameters: string[];   // Required parameters
+    responses: string[];    // Response formats
+  };
+
+  // 2. Implementation details
+  implementation: {
+    architecture: string;   // Architecture overview
+    patterns: string[];    // Used patterns
+    examples: string[];    // Usage examples
+  };
+}
+```
+
+## Error Handling and Monitoring
+
+1. Error Management:
+```typescript
+// Error handling patterns
+class McpErrorManagement {
+  // 1. Error categorization
+  categorizeError(error: unknown): McpError {
+    // Determine error type
+    return this.determineErrorType(error);
+  }
+
+  // 2. Error reporting
+  async reportError(error: McpError) {
+    // Log error
+    await this.logError(error);
+
+    // Notify monitoring
+    await this.notifyMonitoring(error);
+
+    // Update metrics
+    await this.updateErrorMetrics(error);
+  }
+}
+```
+
+## Performance Optimization
+
+1. Performance Monitoring:
+```typescript
+// Performance monitoring patterns
+class McpPerformanceMonitor {
+  // 1. Metrics collection
+  async collectMetrics() {
+    // Gather performance data
+    await this.measureLatency();
+    await this.measureThroughput();
+    await this.measureResourceUsage();
+  }
+
+  // 2. Optimization
+  async optimizePerformance() {
+    // Analyze and optimize
+    await this.analyzeBottlenecks();
+    await this.implementOptimizations();
+    await this.validateImprovements();
+  }
+}
+``` 

@@ -1,0 +1,232 @@
+---
+description: Guidelines for using AI Agent Mode effectively in MCP extension development
+globs: ["**/*.{ts,js,tsx,jsx}"]
+---
+
+# Agent-Based Development Rules
+
+## Agent Mode Core Principles
+
+1. Context Management:
+```typescript
+// Always ensure proper context by having relevant files open:
+// - Core implementation files
+// - Related test files
+// - Type definition files
+// Example structure for MCP server development:
+/*
+Open files should include:
+- src/services/McpServer.ts
+- src/types/mcp-sdk.d.ts
+- src/test/McpServer.test.ts
+*/
+```
+
+2. MCP Server Development with Agent Mode:
+```typescript
+// When implementing MCP server features, follow this pattern:
+class McpServerImplementation {
+  // 1. Define clear capability interfaces
+  capabilities = {
+    resources: { subscribe: true },
+    tools: { listChanged: true },
+    // Document each capability
+  };
+
+  // 2. Implement request handlers with proper typing
+  async handleRequest(request: McpRequest): Promise<McpResponse> {
+    // Agent will help maintain type safety and error handling
+  }
+
+  // 3. Include comprehensive error handling
+  private handleError(error: unknown): McpError {
+    // Agent will suggest appropriate error categorization
+  }
+}
+```
+
+## Development Workflow Integration
+
+1. Planning Phase Requirements:
+- Open relevant implementation files
+- Reference existing patterns
+- Document architectural decisions
+
+2. Implementation Guidelines:
+```typescript
+// Example: Adding new MCP server capability
+class McpServer {
+  // 1. Define capability interface
+  interface NewCapability {
+    feature: boolean;
+    options: CapabilityOptions;
+  }
+
+  // 2. Register with server
+  constructor() {
+    super({
+      capabilities: {
+        newFeature: this.handleNewFeature.bind(this)
+      }
+    });
+  }
+
+  // 3. Implement handler with proper typing
+  private async handleNewFeature(
+    request: NewFeatureRequest
+  ): Promise<NewFeatureResponse> {
+    // Implementation
+  }
+}
+```
+
+3. Code Review Checklist:
+- Type safety verification
+- Error handling completeness
+- Documentation coverage
+- Test implementation
+- Pattern consistency
+
+## MCP Server Integration
+
+1. Server Initialization:
+```typescript
+// Follow this pattern for MCP server setup
+async function initializeMcpServer() {
+  const server = new McpServer({
+    name: "custom-mcp-server",
+    version: process.env.VERSION || "1.0.0",
+    capabilities: {
+      // Define supported capabilities
+      resources: { subscribe: true },
+      tools: { listChanged: true }
+    }
+  });
+
+  // Set up transport
+  const transport = new McpTransport();
+  await server.connect(transport);
+
+  // Initialize features
+  await server.initialize();
+}
+```
+
+2. Feature Implementation:
+```typescript
+// Pattern for implementing MCP features
+class McpFeature {
+  // 1. Define feature interface
+  interface FeatureDefinition {
+    name: string;
+    version: string;
+    capabilities: FeatureCapabilities;
+  }
+
+  // 2. Implement feature handlers
+  async handleFeatureRequest(
+    request: FeatureRequest
+  ): Promise<FeatureResponse> {
+    try {
+      // Validate request
+      this.validateRequest(request);
+
+      // Process request
+      const result = await this.processRequest(request);
+
+      return this.formatResponse(result);
+    } catch (error) {
+      return this.handleError(error);
+    }
+  }
+}
+```
+
+## Security Guidelines
+
+1. Code Generation Rules:
+- Validate all generated code
+- Ensure proper error handling
+- Maintain type safety
+- Follow security best practices
+
+2. File Operations:
+```typescript
+// Secure file operation pattern
+async function secureFileOperation() {
+  // 1. Validate operation context
+  validateContext();
+
+  // 2. Check permissions
+  await checkPermissions();
+
+  // 3. Perform operation with proper error handling
+  try {
+    await performOperation();
+  } catch (error) {
+    handleOperationError(error);
+  }
+}
+```
+
+## Troubleshooting Patterns
+
+1. Context Resolution:
+```typescript
+// Pattern for resolving context issues
+async function resolveContext() {
+  // 1. Verify file availability
+  const requiredFiles = [
+    'McpServer.ts',
+    'types/mcp-sdk.d.ts'
+  ];
+  
+  // 2. Load additional context if needed
+  await loadAdditionalContext();
+
+  // 3. Validate context completeness
+  validateContext();
+}
+```
+
+2. Error Resolution:
+```typescript
+// Pattern for handling MCP server errors
+class McpErrorHandler {
+  async handleError(error: unknown): Promise<McpError> {
+    // 1. Categorize error
+    const errorType = this.categorizeError(error);
+
+    // 2. Log appropriate details
+    this.logError(errorType, error);
+
+    // 3. Return structured error response
+    return this.formatError(errorType, error);
+  }
+}
+```
+
+## Testing Requirements
+
+1. Test Coverage Rules:
+```typescript
+// Required test patterns
+describe('MCP Feature', () => {
+  // 1. Capability tests
+  it('supports required capabilities', () => {
+    expectCapabilities(server);
+  });
+
+  // 2. Request handling tests
+  it('handles requests correctly', async () => {
+    const response = await server.handleRequest(mockRequest);
+    expectValidResponse(response);
+  });
+
+  // 3. Error handling tests
+  it('handles errors appropriately', async () => {
+    const errorResponse = await server.handleError(mockError);
+    expectValidErrorResponse(errorResponse);
+  });
+});
+``` 
