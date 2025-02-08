@@ -1,46 +1,68 @@
-import '@testing-library/jest-dom';
 import { vi } from 'vitest';
-import { cleanup } from '@testing-library/svelte';
 
-// Mock Podman Desktop API
-vi.mock('@podman-desktop/api', () => ({
+// Mock functions
+const fn = () => vi.fn();
+
+// Consolidated mock for @podman-desktop/api
+const mockPodmanDesktopApi = {
   provider: {
-    createProvider: vi.fn().mockReturnValue({
+    createProvider: fn().mockReturnValue({
       name: 'MCP Server Manager',
       id: 'mcp-server-manager',
       status: 'ready',
-      updateStatus: vi.fn(),
-      dispose: vi.fn()
+      updateStatus: fn(),
+      dispose: fn()
     })
   },
   window: {
-    showInformationMessage: vi.fn(),
-    showErrorMessage: vi.fn(),
-    createStatusBarItem: vi.fn().mockReturnValue({
+    showInformationMessage: fn(),
+    showErrorMessage: fn(),
+    createStatusBarItem: fn().mockReturnValue({
       text: '',
       command: '',
-      show: vi.fn(),
-      hide: vi.fn(),
-      dispose: vi.fn()
+      show: fn(),
+      hide: fn(),
+      dispose: fn()
     }),
-    createWebviewPanel: vi.fn().mockReturnValue({
+    createWebviewPanel: fn().mockReturnValue({
       webview: {
         html: '',
-        onDidReceiveMessage: vi.fn(),
-        postMessage: vi.fn()
+        onDidReceiveMessage: fn(),
+        postMessage: fn()
       },
-      dispose: vi.fn()
+      dispose: fn()
     })
   },
   commands: {
-    registerCommand: vi.fn().mockReturnValue({
-      dispose: vi.fn()
+    registerCommand: fn().mockReturnValue({
+      dispose: fn()
     }),
-    executeCommand: vi.fn()
+    executeCommand: fn()
+  },
+  workspace: {
+    getConfiguration: fn().mockReturnValue({
+      get: fn(),
+      update: fn()
+    })
   }
+};
+
+// Mock the API module
+vi.mock('@podman-desktop/api', () => mockPodmanDesktopApi);
+
+// Mock child_process.exec
+vi.mock('child_process', () => ({
+  exec: fn()
 }));
 
-// Cleanup after each test
-afterEach(() => {
-  cleanup();
-}); 
+// Mock util.promisify
+vi.mock('util', () => ({
+  promisify: fn().mockImplementation((fn: Function) => fn)
+}));
+
+// Clear all mocks before each test
+beforeEach(() => {
+  vi.clearAllMocks();
+});
+
+export { mockPodmanDesktopApi }; 

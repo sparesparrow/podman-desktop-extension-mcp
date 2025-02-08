@@ -29,9 +29,7 @@ export default defineConfig({
     environment: 'jsdom',
     alias: [{ find: '@testing-library/svelte', replacement: '@testing-library/svelte/svelte5' }],
     deps: {
-      inline: [
-
-      ],
+      inline: [],
     },
   },
   base: '',
@@ -42,9 +40,8 @@ export default defineConfig({
   },
   build: {
     sourcemap: true,
-    outDir: '../backend/media',
-    assetsDir: '.',
-
+    outDir: './dist/frontend',
+    assetsDir: 'assets',
     emptyOutDir: true,
     reportCompressedSize: false,
   },

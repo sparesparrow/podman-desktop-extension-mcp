@@ -129,7 +129,7 @@ export class GrpcTransportFactory extends BaseTransportFactory {
       connect: async () => grpcTransport.connect(),
       disconnect: async () => grpcTransport.disconnect(),
       send: async (data) => {
-        await grpcTransport.send('send', data);
+        await grpcTransport.send(data);
       },
       receive: async () => {
         return new Promise<unknown>((resolve) => {

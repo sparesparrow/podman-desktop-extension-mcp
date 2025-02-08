@@ -69,7 +69,7 @@ export class WebSocketTransport extends BaseTransport {
         }
       });
 
-      this.ws.on('close', (code: number, reason: string) => {
+      this.ws.on('close', (_code: number, reason: string) => {
         this.emit('disconnected', reason);
         this.handleReconnect();
       });
