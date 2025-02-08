@@ -1,44 +1,14 @@
 import * as extensionApi from '@podman-desktop/api';
 import { exec } from 'child_process';
 import { promisify } from 'util';
+import {
+  MCPServerConfig,
+  MCPServerError,
+  MCPErrorCode,
+  MCPHealthCheckError
+} from './mcp-types';
 
 const execAsync = promisify(exec);
-
-export interface MCPServerConfig {
-  name: string;
-  image: string;
-  port: number;
-  capabilities?: {
-    resources?: boolean;
-    tools?: boolean;
-    prompts?: boolean;
-    logging?: boolean;
-  };
-  readinessProbe?: {
-    initialDelaySeconds?: number;
-    periodSeconds?: number;
-    timeoutSeconds?: number;
-    successThreshold?: number;
-    failureThreshold?: number;
-    exec?: {
-      command: string[];
-    };
-    httpGet?: {
-      path: string;
-      port: number;
-    };
-  };
-  api?: {
-    port: number;
-    host?: string;
-    basePath?: string;
-    tls?: {
-      enabled: boolean;
-      cert?: string;
-      key?: string;
-    };
-  };
-}
 
 export class MCPServerManager {
   private servers: Map<string, MCPServerConfig> = new Map();
@@ -99,11 +69,10 @@ export class MCPServerManager {
         failures++;
         if (failures >= failureThreshold) {
           this.provider.updateStatus('error');
-          extensionApi.window.showErrorMessage(
-            `Server ${name} failed readiness check ${failures} times`
+          throw new MCPHealthCheckError(
+            `Server ${name} failed readiness check ${failures} times`,
+            { failures, threshold: failureThreshold }
           );
-          clearInterval(interval);
-          this.healthChecks.delete(name);
         }
       } else {
         failures = 0;
@@ -112,6 +81,74 @@ export class MCPServerManager {
     }, periodSeconds * 1000);
 
     this.healthChecks.set(name, interval);
+  }
+
+  private buildContainerCommand(config: MCPServerConfig): string {
+    let runCommand = `podman run -d --name ${config.name}`;
+
+    // Add resource limits
+    if (config.resourceLimits) {
+      if (config.resourceLimits.cpu) {
+        runCommand += ` --cpus=${config.resourceLimits.cpu}`;
+      }
+      if (config.resourceLimits.memory) {
+        runCommand += ` --memory=${config.resourceLimits.memory}`;
+      }
+      if (config.resourceLimits.gpu) {
+        runCommand += ` --device nvidia.com/gpu=${config.resourceLimits.gpu.count || 'all'}`;
+        if (config.resourceLimits.gpu.memory) {
+          runCommand += ` -e NVIDIA_VISIBLE_DEVICES=all`;
+          runCommand += ` -e GPU_MEMORY_LIMIT=${config.resourceLimits.gpu.memory}`;
+        }
+      }
+    }
+
+    // Add network configuration
+    if (config.transport.type === 'http-sse') {
+      runCommand += ` -p ${config.transport.port}:${config.transport.port}`;
+      if (config.transport.tls?.enabled) {
+        runCommand += ` -v ${config.transport.tls.cert}:/certs/cert.pem:ro`;
+        runCommand += ` -v ${config.transport.tls.key}:/certs/key.pem:ro`;
+        if (config.transport.tls.ca) {
+          runCommand += ` -v ${config.transport.tls.ca}:/certs/ca.pem:ro`;
+        }
+      }
+    }
+
+    // Add volumes
+    if (config.volumes) {
+      for (const volume of config.volumes) {
+        if (volume.hostPath) {
+          runCommand += ` -v ${volume.hostPath}:${volume.mountPath}`;
+        } else if (volume.persistent) {
+          runCommand += ` -v ${volume.name}:${volume.mountPath}`;
+        }
+      }
+    }
+
+    // Add environment variables
+    if (config.env) {
+      for (const [key, value] of Object.entries(config.env)) {
+        runCommand += ` -e ${key}=${value}`;
+      }
+    }
+
+    // Add labels
+    if (config.labels) {
+      for (const [key, value] of Object.entries(config.labels)) {
+        runCommand += ` -l ${key}=${value}`;
+      }
+    }
+
+    // Add metrics port if enabled
+    if (config.metrics?.enabled && config.metrics.port) {
+      runCommand += ` -p ${config.metrics.port}:${config.metrics.port}`;
+    }
+
+    // Add image and version
+    runCommand += ` ${config.image}:${config.version}`;
+
+    return runCommand;
   }
 
   async startServer(config: MCPServerConfig): Promise<void> {
@@ -123,29 +160,21 @@ export class MCPServerManager {
         `podman ps -a --filter name=${config.name} --format {{.Names}}`
       );
       if (psOutput.trim()) {
-        this.provider.updateStatus('error');
-        throw new Error(`Server ${config.name} already exists`);
+        throw new MCPServerError(
+          `Server ${config.name} already exists`,
+          MCPErrorCode.CONTAINER_ERROR
+        );
       }
 
-      // Prepare container run command with port mappings
-      let runCommand = `podman run -d --name ${config.name}`;
-      
-      // Add main port mapping
-      runCommand += ` -p ${config.port}:${config.port}`;
-      
-      // Add API port mapping if configured
-      if (config.api?.port) {
-        runCommand += ` -p ${config.api.port}:${config.api.port}`;
-      }
-      
-      // Add image name
-      runCommand += ` ${config.image}`;
-
-      // Start the container
+      // Build and execute container run command
+      const runCommand = this.buildContainerCommand(config);
       const { stdout } = await execAsync(runCommand);
+      
       if (!stdout.trim()) {
-        this.provider.updateStatus('error');
-        throw new Error('Failed to start server: no container ID returned');
+        throw new MCPServerError(
+          'Failed to start server: no container ID returned',
+          MCPErrorCode.CONTAINER_ERROR
+        );
       }
 
       this.servers.set(config.name, config);
@@ -155,8 +184,10 @@ export class MCPServerManager {
         await this.startHealthCheck(config.name, config);
         const isReady = await this.checkReadiness(config.name, config);
         if (!isReady) {
-          this.provider.updateStatus('error');
-          throw new Error('Server failed initial readiness check');
+          throw new MCPHealthCheckError(
+            'Server failed initial readiness check',
+            { config }
+          );
         }
         this.provider.updateStatus('ready');
       } else {
@@ -166,9 +197,16 @@ export class MCPServerManager {
       extensionApi.window.showInformationMessage(
         `MCP server ${config.name} started with container ID: ${stdout.trim()}`
       );
-    } catch (error) {
+    } catch (err: unknown) {
       this.provider.updateStatus('error');
-      throw error;
+      if (err instanceof MCPServerError) {
+        throw err;
+      }
+      throw new MCPServerError(
+        err instanceof Error ? err.message : 'Unknown error occurred',
+        MCPErrorCode.UNKNOWN_ERROR,
+        { originalError: err }
+      );
     }
   }
 
