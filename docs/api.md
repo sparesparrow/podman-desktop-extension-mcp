@@ -196,7 +196,7 @@ await client.connect();
 
 await client.startServer({
   name: 'test-server',
-  image: 'ghcr.io/sparesparrow/mcp-server:1.0.0',
+  image: 'ghcr.io/sparesparrow/podman-desktop-extension-mcp:1.0.0',
   port: 3001,
   capabilities: {
     resources: true,

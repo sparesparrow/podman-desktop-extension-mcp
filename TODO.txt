@@ -73,6 +73,7 @@
    - [x] Add security documentation (docs/security.md)
    - [x] Add architecture diagrams (docs/diagrams.md)
    - [ ] Add user guide and tutorials
+   - [x] Update repository name references to podman-desktop-extension-mcp
 
 ## Phase 6: Performance and Optimization
 1. [ ] Optimize Performance
@@ -98,9 +99,11 @@
 2. Begin UI component enhancements
 3. Start implementing testing infrastructure
 4. Create user guide and tutorials
+5. Verify all repository name references are updated
 
 ## Recently Completed
 1. ✅ Documentation restructuring and updates
 2. ✅ Core API type definitions
 3. ✅ Security architecture documentation
-4. ✅ Development workflow guidelines 
+4. ✅ Development workflow guidelines
+5. ✅ Repository rename to podman-desktop-extension-mcp 

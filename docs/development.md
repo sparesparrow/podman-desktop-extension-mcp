@@ -16,8 +16,8 @@ This guide provides detailed information for developers who want to contribute t
 
 1. **Clone and Install**
    ```bash
-   git clone https://github.com/sparesparrow/mcp-server-manager-extension.git
-   cd mcp-server-manager-extension
+   git clone https://github.com/sparesparrow/podman-desktop-extension-mcp.git
+   cd podman-desktop-extension-mcp
    pnpm install
    ```
 
@@ -42,7 +42,7 @@ This guide provides detailed information for developers who want to contribute t
 ## Project Structure
 
 ```
-mcp-server-manager-extension/
+podman-desktop-extension-mcp/
 ├── src/
 │   ├── core/           # Core MCP client implementation
 │   ├── health/         # Health check services

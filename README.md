@@ -1,4 +1,4 @@
-# MCP Server Manager Extension for Podman Desktop
+# MCP Server Manager Extension for Podman Desktop (podman-desktop-extension-mcp)
 
 A comprehensive Podman Desktop extension that implements the Model Context Protocol (MCP), providing Linux users and others with a complete alternative to Claude Desktop. This extension enables secure deployment and management of MCP servers using Podman's container infrastructure.
 
@@ -44,8 +44,8 @@ For detailed architecture and design information, see our [Technical Documentati
 
 1. Clone and setup:
 ```bash
-git clone https://github.com/sparesparrow/mcp-server-manager-extension.git
-cd mcp-server-manager-extension
+git clone https://github.com/sparesparrow/podman-desktop-extension-mcp.git
+cd podman-desktop-extension-mcp
 pnpm install
 pnpm run build
 ```
@@ -77,7 +77,7 @@ Access these commands through Podman Desktop's command palette (Ctrl/Cmd + Shift
 ```typescript
 {
   name: 'mcp-server',
-  image: 'ghcr.io/sparesparrow/mcp-server-manager-extension:latest',
+  image: 'ghcr.io/sparesparrow/podman-desktop-extension-mcp:latest',
   port: 3000,
   capabilities: {
     resources: true,
@@ -104,6 +104,6 @@ Apache-2.0 - see [LICENSE](LICENSE) for details.
 
 - [Model Context Protocol (MCP) Specification](https://modelcontextprotocol.io)
 - [Podman Desktop](https://podman-desktop.io)
-- [MCP Servers Repository](https://github.com/sparesparrow/mcp-servers)
+- [MCP Servers Repository](https://github.com/sparesparrow/podman-desktop-extension-mcp)
 
 ![MCP Server Manager Extension](/images/5c0c0e9fe4def0b584c04d37849941da55e5e71c-2401x1000.webp)
