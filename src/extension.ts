@@ -9,7 +9,7 @@ let service: MCPServerService;
 // Default MCP server configuration
 const defaultConfig: MCPServerConfig = {
   name: 'mcp-server',
-  image: 'ghcr.io/sparesparrow/mcp-server-manager-extension',
+  image: 'ghcr.io/sparesparrow/podman-desktop-extension-mcp',
   version: 'latest',
   transport: {
     type: 'http-sse',
@@ -67,7 +67,7 @@ export async function activate(context: extensionApi.ExtensionContext): Promise<
   // Create provider
   const provider = extensionApi.provider.createProvider({
     name: 'MCP Server Manager',
-    id: 'mcp-server-manager',
+    id: 'podman-desktop-extension-mcp',
     status: 'not-installed',
     images: {
       icon: './resources/icon.png',
@@ -111,7 +111,7 @@ export async function activate(context: extensionApi.ExtensionContext): Promise<
   statusBarItem.show();
 
   // Create webview panel
-  const panel = extensionApi.window.createWebviewPanel('mcp-server-manager', 'MCP Server Manager', {});
+  const panel = extensionApi.window.createWebviewPanel('podman-desktop-extension-mcp', 'MCP Server Manager', {});
 
   // Set webview content
   panel.webview.html = `

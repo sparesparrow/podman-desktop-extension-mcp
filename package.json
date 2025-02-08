@@ -1,5 +1,5 @@
 {
-  "name": "mcp-server-manager",
+  "name": "podman-desktop-extension-mcp",
   "displayName": "MCP Server Manager",
   "description": "Model Context Protocol (MCP) Server Manager for Podman Desktop",
   "version": "0.0.1",
@@ -19,6 +19,7 @@
     "preview": "vite preview"
   },
   "contributes": {
+    "id": "podman-desktop-extension-mcp",
     "views": {
       "podman-desktop-view": [
         {

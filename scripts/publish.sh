@@ -49,23 +49,27 @@ function verify_build_artifacts() {
     fi
 }
 
-# Modified build_container function with better error handling
+# Modified build_container function with explicit podman/docker selection
 function build_container() {
     echo "Building container..."
     local build_cmd="podman"
+    local sudo_cmd=""
     
-    if ! command -v podman &> /dev/null; then
-        echo "Podman not found, trying Docker..."
-        build_cmd="docker"
+    # Check if podman needs sudo
+    if ! podman info &>/dev/null; then
+        sudo_cmd="sudo"
+        echo "Using sudo for podman commands..."
     fi
 
-    if ! $build_cmd build -t ghcr.io/sparesparrow/mcp-server-manager-extension:latest .; then
-        echo "Container build failed - verifying artifacts..."
-        verify_build_artifacts
-        echo "All required artifacts exist. Check Dockerfile COPY paths:"
-        grep 'COPY' Containerfile
+    echo "Running build with $build_cmd..."
+    if ! $sudo_cmd $build_cmd build -t ghcr.io/sparesparrow/podman-desktop-extension-mcp:latest .; then
+        echo "Container build failed - checking permissions..."
+        # Add diagnostic commands
+        $sudo_cmd $build_cmd info
+        ls -l dist/ extension.js
         exit 1
     fi
+    echo "Container build successful!"
 }
 
 # Main execution flow with artifact verification

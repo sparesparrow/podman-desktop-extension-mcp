@@ -20,8 +20,8 @@ export class MCPServerService {
       id: 'mcp-server-manager',
       status: 'ready',
       images: {
-        icon: './icon.png',
-        logo: './icon.png'
+        icon: './resources/icon.png',
+        logo: './resources/icon.png'
       }
     });
     this.router = new MCPRouter();

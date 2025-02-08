@@ -19,8 +19,8 @@ fi
 
 # Build container
 echo "Building container..."
-podman build -t ghcr.io/sparesparrow/mcp-server-manager-extension:latest . || {
-    echo "Container build failed"
+podman build -t ghcr.io/sparesparrow/podman-desktop-extension-mcp:latest . || {
+    echo "❌ Build failed"
     exit 1
 }
 
