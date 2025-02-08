@@ -17,7 +17,6 @@ export default defineConfig({
     alias: {
       '/@/': join(PACKAGE_ROOT, 'src') + '/',
       '/@shared/': join(PACKAGE_ROOT, '../shared') + '/',
-      '@/': path.resolve(__dirname, './src'),
     },
   },
   plugins: [svelte({ hot: !process.env.VITEST }), svelteTesting()],
@@ -30,7 +29,9 @@ export default defineConfig({
     environment: 'jsdom',
     alias: [{ find: '@testing-library/svelte', replacement: '@testing-library/svelte/svelte5' }],
     deps: {
-      inline: [],
+      inline: [
+
+      ],
     },
   },
   base: '',
@@ -41,18 +42,9 @@ export default defineConfig({
   },
   build: {
     sourcemap: true,
-    outDir: 'dist',
+    outDir: '../backend/media',
     assetsDir: '.',
-    rollupOptions: {
-      input: {
-        main: path.resolve(__dirname, 'frontend/src/index.html'),
-      },
-      output: {
-        entryFileNames: '[name].js',
-        chunkFileNames: '[name].[hash].js',
-        assetFileNames: '[name].[hash][extname]',
-      },
-    },
+
     emptyOutDir: true,
     reportCompressedSize: false,
   },

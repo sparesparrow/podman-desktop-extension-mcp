@@ -4,9 +4,8 @@ const tailwindTypography = require('@tailwindcss/typography')
 module.exports = {
   content: [
     'index.html',
-    'src/**/*.{svelte,ts,css,tsx}',
-    'frontend/src/**/*.{svelte,ts,css}',
-    'node_modules/@podman-desktop/ui-svelte/dist/**/*.{svelte,ts,css}'
+    'src/**/*.{svelte,ts,css}',
+    '../../node_modules/@podman-desktop/ui-svelte/dist/**/*.{svelte,ts,css}',
   ],
   darkMode: 'class',
   theme: {

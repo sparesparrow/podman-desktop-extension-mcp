@@ -26,15 +26,10 @@
     "moduleResolution": "node",
     "baseUrl": ".",
     "paths": {
-      "@modelcontextprotocol/sdk/*": ["node_modules/@modelcontextprotocol/sdk/dist/esm/*"],
-      "@/*": ["src/*"]
-    },
-    "types": ["node", "react", "react-dom", "vitest/globals"]
+      "@modelcontextprotocol/sdk/*": ["node_modules/@modelcontextprotocol/sdk/dist/esm/*"]
+    }
   },
-  "include": [
-    "src/**/*",
-    "src/types/*.d.ts"
-  ],
+  "include": ["src/**/*"],
   "exclude": [
     "src/**/*.test.ts",
     "src/__tests__/**/*",
