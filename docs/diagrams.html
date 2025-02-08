@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>diagrams.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/* https://github.com/microsoft/vscode/blob/master/extensions/markdown-language-features/media/markdown.css */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif);
+	font-size: var(--vscode-markdown-font-size, 14px);
+	padding: 0 26px;
+	line-height: var(--vscode-markdown-line-height, 22px);
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left-width: 5px;
+	border-left-style: solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 1em;
+	line-height: 1.357em;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+pre code {
+	color: var(--vscode-editor-foreground);
+	tab-size: 4;
+}
+
+/** Theming */
+
+.vscode-light pre {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+</style>
+
+<style>
+/*
+
+github.com style (c) Vasily Polovnyov <vast@whiteants.net>
+
+*/
+
+.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 0.5em;
+  color: #333;
+  background: #f8f8f8;
+}
+
+.hljs-comment,
+.hljs-quote {
+  color: #998;
+  font-style: italic;
+}
+
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-subst {
+  color: #333;
+  font-weight: bold;
+}
+
+.hljs-number,
+.hljs-literal,
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag .hljs-attr {
+  color: #008080;
+}
+
+.hljs-string,
+.hljs-doctag {
+  color: #d14;
+}
+
+.hljs-title,
+.hljs-section,
+.hljs-selector-id {
+  color: #900;
+  font-weight: bold;
+}
+
+.hljs-subst {
+  font-weight: normal;
+}
+
+.hljs-type,
+.hljs-class .hljs-title {
+  color: #458;
+  font-weight: bold;
+}
+
+.hljs-tag,
+.hljs-name,
+.hljs-attribute {
+  color: #000080;
+  font-weight: normal;
+}
+
+.hljs-regexp,
+.hljs-link {
+  color: #009926;
+}
+
+.hljs-symbol,
+.hljs-bullet {
+  color: #990073;
+}
+
+.hljs-built_in,
+.hljs-builtin-name {
+  color: #0086b3;
+}
+
+.hljs-meta {
+  color: #999;
+  font-weight: bold;
+}
+
+.hljs-deletion {
+  background: #fdd;
+}
+
+.hljs-addition {
+  background: #dfd;
+}
+
+.hljs-emphasis {
+  font-style: italic;
+}
+
+.hljs-strong {
+  font-weight: bold;
+}
+
+</style>
+
+<style>
+/*
+ * Markdown PDF CSS
+ */
+
+ body {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
+	padding: 0 12px;
+}
+
+pre {
+	background-color: #f8f8f8;
+	border: 1px solid #cccccc;
+	border-radius: 3px;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}
+
+pre:not(.hljs) {
+	padding: 23px;
+	line-height: 19px;
+}
+
+blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.emoji {
+	height: 1.4em;
+}
+
+code {
+	font-size: 14px;
+	line-height: 19px;
+}
+
+/* for inline code */
+:not(pre):not(.hljs) > code {
+	color: #C9AE75; /* Change the old color so it seems less like an error */
+	font-size: inherit;
+}
+
+/* Page Break : use <div class="page"/> to insert page break
+-------------------------------------------------------- */
+.page {
+	page-break-after: always;
+}
+
+</style>
+
+<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+</head>
+<body>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
+          ? 'dark'
+          : 'default'
+    });
+  </script>
+<h1 id="architecture-and-design-diagrams">Architecture and Design Diagrams</h1>
+<p>This document provides an overview of the project's architecture and source code design for the MCP Server Manager Extension.</p>
+<p>It is organized as follows:</p>
+<ul>
+<li>A brief explanation of the source code structure.</li>
+<li>A <strong>Class Diagram</strong> showing key classes and their relationships.</li>
+<li>A <strong>Flowchart</strong> that illustrates the sequence of operations when starting a server.</li>
+<li>A <strong>State Machine Diagram</strong> describing the different provider statuses.</li>
+<li>A <strong>Sequence Diagram</strong> representing the interactions that occur during the server start process.</li>
+<li>A <strong>Package Diagram</strong> that shows the repository structure (based on <code>package.json</code> and related files).</li>
+</ul>
+<blockquote>
+<p><strong>Note:</strong> If some parts need further refinement, please replace the placeholder comments with more detailed information and diagrams.</p>
+</blockquote>
+<hr>
+<h2 id="source-code-structure-overview">Source Code Structure Overview</h2>
+<p>The project is organized as follows:</p>
+<ul>
+<li><strong>src/</strong>
+<ul>
+<li><strong>core/</strong>
+<ul>
+<li><code>mcp-client.ts</code>: Contains the MCP client implementations and the client factory.</li>
+</ul>
+</li>
+<li><strong>health/</strong>
+<ul>
+<li><code>health-check.service.ts</code>: Implements health check strategies using HTTP GET or exec commands.</li>
+</ul>
+</li>
+<li><strong>settings/</strong>
+<ul>
+<li><code>MCPSettings.ts</code>: Manages extension configuration settings.</li>
+</ul>
+</li>
+<li><strong>types/</strong>
+<ul>
+<li><code>mcp-types.ts</code>: Declares types and interfaces for MCP server configurations, errors, etc.</li>
+<li><code>modelcontextprotocol-sdk.d.ts</code>: Provides type definitions for the external MCP SDK.</li>
+</ul>
+</li>
+<li><strong>ui/</strong>
+<ul>
+<li><code>MCPServerManager.tsx</code>: React component for the MCP Server Manager user interface.</li>
+</ul>
+</li>
+<li>Root-level source files:
+<ul>
+<li><code>mcp-server-manager.ts</code>: Main class that handles server lifecycle operations (start/stop, health checks).</li>
+<li><code>mcp-server-service.ts</code>: Provides higher-level operations for managing MCP servers.</li>
+<li><code>mcp-router.ts</code>: Routes commands to appropriate MCP clients.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>.github/</strong> folder and other files (e.g., <code>package.json</code>, <code>tsconfig.json</code>, etc.) handle project configuration, CI, and dependency management.</li>
+</ul>
+<hr>
+<h2 id="mermaid-diagrams">Mermaid Diagrams</h2>
+<h3 id="1-class-diagram">1. Class Diagram</h3>
+<p>This diagram shows the key classes and their interdependencies.</p>
+<pre><code class="language-mermaid"><div class="mermaid">%% Class Diagram for Key Components
+classDiagram
+    class MCPServerManager {
+      +startServer(config: MCPServerConfig): Promise<void>
+      +stopServer(name: string): Promise<void>
+      +getServerStatus(name: string): Promise<string>
+      +listServers(): Promise<string[]>
+    }
+    class MCPServerService {
+      +startServer(config: MCPServerConfig): Promise<void>
+      +stopServer(name: string): Promise<void>
+      +callServerTool(name: string, toolName: string, args: any): Promise<any>
+    }
+    class MCPRouter {
+      +connectServer(config: MCPServerConfig): Promise<void>
+      +disconnectServer(name: string): Promise<void>
+      +listServerTools(name: string): Promise<any[]>
+    }
+    class TypedMCPClient {
+      +connect(): Promise<void>
+      +disconnect(): Promise<void>
+      +listTools(): Promise<ToolDefinition[]>
+      +callTool(name: string, args: any): Promise<any>
+    }
+    class MCPClientFactory {
+      +createClient(config: MCPServerTransport): MCPClient
+    }
+    MCPServerManager --> MCPServerService : uses
+    MCPServerService --> MCPRouter : delegates to
+    MCPRouter --> TypedMCPClient : creates
+    MCPClientFactory --> TypedMCPClient : instantiates
+</div></code></pre>
+<hr>
+<h3 id="2-flowchart-diagram">2. Flowchart Diagram</h3>
+<p>This flowchart illustrates the major steps when a user requests to start a server.</p>
+<pre><code class="language-mermaid"><div class="mermaid">%% Flowchart for Starting a Server Process
+flowchart TD
+    A[Start Server Request] --> B[Update provider status to 'starting']
+    B --> C[Check for existing container]
+    C --> D{Container Exists?}
+    D -- Yes --> E[Update provider status to 'error' & throw error]
+    D -- No --> F[Build the podman run command]
+    F --> G[Execute command to start container]
+    G --> H[Check container ID returned]
+    H --> I{Is Container ID Valid?}
+    I -- No --> J[Update provider status to 'error' & throw error]
+    I -- Yes --> K[Store server configuration and trigger health check]
+    K --> L[Update provider status to 'ready']
+    L --> M[Display information message to user]
+</div></code></pre>
+<hr>
+<h3 id="3-state-machine-diagram">3. State Machine Diagram</h3>
+<p>This diagram represents the provider status transitions during server lifecycle operations.</p>
+<pre><code class="language-mermaid"><div class="mermaid">%% State Machine Diagram for Provider States
+stateDiagram-v2
+    [*] --> ready
+    ready --> starting : startServer
+    starting --> ready : success
+    starting --> error : failure
+    ready --> stopping : stopServer
+    stopping --> stopped : success
+    stopping --> error : failure
+    error --> ready : retry/resolve
+</div></code></pre>
+<hr>
+<h3 id="4-sequence-diagram">4. Sequence Diagram</h3>
+<p>This diagram shows the sequence of interactions when a server is started.</p>
+<pre><code class="language-mermaid"><div class="mermaid">%% Sequence Diagram for Starting a Server
+sequenceDiagram
+    participant UI as User Interface
+    participant Mngr as MCPServerManager
+    participant Exec as execAsync (Podman Command Executor)
+    participant Provider as Provider (Extension API)
+    participant Router as MCPRouter
+
+    UI->>Mngr: startServer(config)
+    Mngr->>Provider: updateStatus("starting")
+    Mngr->>Exec: Execute "podman ps -a" to check for container
+    Exec-->>Mngr: Existing container check result
+    alt Container Exists
+       Mngr->>Provider: updateStatus("error")
+       Mngr->>UI: throw error "Server already exists"
+    else No Container Exists
+       Mngr->>Exec: Execute "podman run -d ..." to start container
+       Exec-->>Mngr: Returns container ID
+       Mngr->>Mngr: Initiate health check (startHealthCheck)
+       Mngr->>Router: connectServer(config)
+       Mngr->>Provider: updateStatus("ready")
+       Mngr->>UI: showInformationMessage("Server started with container ID")
+    end
+</div></code></pre>
+<hr>
+<h3 id="5-package-diagram">5. Package Diagram</h3>
+<p>This diagram outlines the repository's package-related files and their high-level relationships.</p>
+<pre><code class="language-mermaid"><div class="mermaid">%% Package Diagram for Repository Structure
+graph TD
+    A[package.json] --> B[README.md]
+    A --> C[tsconfig.json]
+    A --> D[.gitattributes]
+    A --> E[.github/dependabot.yml]
+    A --> F[.github/workflows/pr-check.yaml]
+    A --> G[src/]
+</div></code></pre>
+<hr>
+<h2 id="placeholders--instructions-for-further-detail">Placeholders &amp; Instructions for Further Detail</h2>
+<p>If any of the diagrams or sections require further detail, please insert the following instructions at the appropriate locations:</p>
+<ul>
+<li>
+<p><strong>[Placeholder for Extended Class Diagram]:</strong><br>
+<em>&quot;Please expand the class diagram to include additional classes (for example, error classes and mocks) and their relationships where applicable. Include methods and properties that are critical for understanding interactions.&quot;</em></p>
+</li>
+<li>
+<p><strong>[Placeholder for Extended Package Diagram]:</strong><br>
+<em>&quot;Detail the relationship between the build tools (pnpm, eslint, jest) and the configuration files. Include any additional files like <code>.editorconfig</code> or custom scripts if present in the repository.&quot;</em></p>
+</li>
+<li>
+<p><strong>[Additional Flow Details]:</strong><br>
+<em>&quot;Include any additional branches or error handling paths that were merged after the recent feature updates. Verify that the container lifecycle (start/stop/dispose) is fully represented.&quot;</em></p>
+</li>
+</ul>
+<p>Please replace these placeholders with finalized diagrams and detailed comments before release.</p>
+<hr>
+<p>This documentation should serve as a strong foundation for understanding the project architecture and guiding further development.</p>
+<p>Happy documenting!</p>
+
+</body>
+</html>

@@ -1,0 +1,32 @@
+{
+  "extends": "@tsconfig/svelte/tsconfig.json",
+  "compilerOptions": {
+    "target": "ESNext",
+    "useDefineForClassFields": true,
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "resolveJsonModule": true,
+    "allowJs": true,
+    "checkJs": true,
+    "isolatedModules": true,
+    "types": ["vitest", "@testing-library/jest-dom"],
+    "paths": {
+      "/@/*": ["./src/*"],
+      "@shared/*": ["../shared/*"],
+      "@podman-desktop/api": ["../../types/podman-desktop-api"],
+      "@podman-desktop/ui-svelte": ["./src/types/podman-desktop-ui-svelte"]
+    },
+    "baseUrl": ".",
+    "strict": true
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.js",
+    "src/**/*.svelte",
+    "src/**/*.d.ts",
+    "../shared/**/*.ts",
+    "../../types/*.d.ts",
+    "vite.config.ts"
+  ],
+  "references": [{ "path": "./tsconfig.node.json" }]
+}

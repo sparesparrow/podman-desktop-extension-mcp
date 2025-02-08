@@ -1,15 +1,27 @@
-FROM scratch as builder
-COPY dist/ /extension/dist
-COPY package.json /extension/
-COPY LICENSE /extension/
-COPY icon.png /extension/
-COPY README.md /extension/
+FROM node:18-alpine
 
-FROM scratch
+# Install pnpm globally
+RUN npm install -g pnpm
 
-LABEL org.opencontainers.image.title="Your Hello World Extension" \
-        org.opencontainers.image.description="Hello World Extension" \
-        org.opencontainers.image.vendor="Your Org / Username" \
-        io.podman-desktop.api.version=">= 1.12.0"
+# Create extension directory
+WORKDIR /extension
 
-COPY --from=builder /extension /extension
+# Copy files
+COPY . .
+
+# Install dependencies and build
+RUN pnpm install --frozen-lockfile && \
+    pnpm run build
+
+# Add metadata
+LABEL org.opencontainers.image.title="MCP Server Manager Extension"
+LABEL org.opencontainers.image.description="A Podman Desktop extension for managing Model Context Protocol (MCP) servers"
+LABEL org.opencontainers.image.vendor="sparesparrow"
+LABEL org.opencontainers.image.source="https://github.com/sparesparrow/mcp-server-manager-extension"
+LABEL org.opencontainers.image.licenses="Apache-2.0"
+LABEL io.podman-desktop.api.version=">= 1.10.0"
+LABEL io.podman-desktop.extension="true"
+LABEL io.podman-desktop.extension.icon="/extension/resources/icon.png"
+
+# Command to verify extension
+CMD ["pnpm", "test"]

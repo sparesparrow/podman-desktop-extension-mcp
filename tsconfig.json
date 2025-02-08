@@ -1,17 +1,44 @@
 {
   "compilerOptions": {
     "target": "ES2020",
-    "module": "CommonJS",
-    "moduleResolution": "Node",
-    "resolveJsonModule": true,
-    "lib": ["ES2020", "webworker"],
-    "sourceMap": true,
-    "rootDir": "src",
+    "module": "commonjs",
     "outDir": "dist",
+    "rootDir": "src",
+    "strict": true,
+    "esModuleInterop": true,
     "skipLibCheck": true,
-    "types": ["node"],
-    "strictNullChecks": true,
-    "allowSyntheticDefaultImports": true
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "declaration": true,
+    "sourceMap": true,
+    "lib": ["ES2020", "DOM"],
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "alwaysStrict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+    "jsx": "react",
+    "jsxFactory": "React.createElement",
+    "jsxFragmentFactory": "React.Fragment",
+    "moduleResolution": "node",
+    "baseUrl": ".",
+    "paths": {
+      "@modelcontextprotocol/sdk/*": ["node_modules/@modelcontextprotocol/sdk/dist/esm/*"],
+      "@/*": ["src/*"]
+    },
+    "types": ["node", "react", "react-dom", "vitest/globals"]
   },
-  "include": ["src"]
+  "include": [
+    "src/**/*",
+    "src/types/*.d.ts"
+  ],
+  "exclude": [
+    "src/**/*.test.ts",
+    "src/__tests__/**/*",
+    "src/__mocks__/**/*",
+    "node_modules"
+  ]
 }

@@ -3,5 +3,10 @@ node_modules
 dist
 .eslintcache
 **/coverage
-media
+.idea
+output
 .env
+_dev
+.cursor
+.cursorrules
+

@@ -5,3 +5,7 @@ dist
 **/coverage
 media
 .env
+<<<<<<< Updated upstream
+=======
+_dev
+>>>>>>> Stashed changes
