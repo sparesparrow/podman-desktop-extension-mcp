@@ -1,61 +1,78 @@
 # MCP Server Manager Extension for Podman Desktop
 
-A Podman Desktop extension for managing Model Context Protocol (MCP) servers. This extension allows you to easily start, stop, and monitor MCP servers using Podman containers.
+A comprehensive Podman Desktop extension that implements the Model Context Protocol (MCP), providing Linux users and others with a complete alternative to Claude Desktop. This extension enables secure deployment and management of MCP servers using Podman's container infrastructure.
 
-## Features
+## Overview
 
-- Start MCP servers with configurable options
-- Stop running MCP servers
-- Check server status
-- List all running MCP servers
-- Monitor server health
-- Support for standard MCP capabilities (resources, tools, prompts, logging)
+The MCP Server Manager extension leverages Podman Desktop's extension capabilities to deliver:
 
-## Requirements
+- Full MCP client and server implementation
+- Secure container-based deployment
+- Integrated AI assistant capabilities
+- Native Linux support with enhanced security through Podman's rootless architecture
+
+For detailed architecture and design information, see our [Technical Documentation](docs/diagrams.md).
+
+## Core Features
+
+- **Server Management**
+  - Start/stop MCP servers with configurable options
+  - Monitor server health and status
+  - List and manage multiple server instances
+  
+- **MCP Client Integration**
+  - Direct AI assistant interaction
+  - File system integration for data management
+  - Secure API key handling
+  
+- **Security Features**
+  - Rootless container execution
+  - Resource isolation
+  - Access control enforcement
+  - Encrypted communication
+
+## Quick Start
+
+### Requirements
 
 - Podman Desktop >= 1.10.0
-- Podman installed and configured on your system
+- Podman installed and configured
 - Node.js >= 16.x
 - pnpm >= 8.x
 
-## Installation
+### Installation
 
-1. Clone the repository:
+1. Clone and setup:
 ```bash
 git clone https://github.com/sparesparrow/mcp-server-manager-extension.git
 cd mcp-server-manager-extension
-```
-
-2. Install dependencies:
-```bash
 pnpm install
-```
-
-3. Build the extension:
-```bash
 pnpm run build
 ```
 
-4. Install the extension in Podman Desktop:
+2. Install in Podman Desktop:
    - Open Podman Desktop
    - Go to Settings > Extensions
    - Click "Install from Directory"
    - Select the built extension directory
 
+## Documentation
+
+- [Architecture and Design](docs/diagrams.md) - Detailed technical architecture
+- [Security Guide](docs/security.md) - Security features and best practices
+- [Development Guide](docs/development.md) - Guide for contributors
+- [API Reference](docs/api.md) - API documentation
+
 ## Usage
 
-The extension adds the following commands to Podman Desktop:
+Access these commands through Podman Desktop's command palette (Ctrl/Cmd + Shift + P):
 
-- `MCP: Start Server` - Start a new MCP server
-- `MCP: Stop Server` - Stop a running MCP server
-- `MCP: Get Status` - Check the status of an MCP server
-- `MCP: List Servers` - List all running MCP servers
+- `MCP: Start Server` - Deploy new MCP server
+- `MCP: Stop Server` - Stop running server
+- `MCP: Get Status` - Check server status
+- `MCP: List Servers` - View all servers
 
-You can access these commands through the Podman Desktop command palette (Ctrl/Cmd + Shift + P).
-
-### Configuration
-
-The default MCP server configuration:
+### Default Configuration
 
 ```typescript
 {
@@ -71,40 +88,19 @@ The default MCP server configuration:
 }
 ```
 
-## Development
-
-1. Watch for changes:
-```bash
-pnpm run watch
-```
-
-### Testing
-
-Run the test suite:
-```bash
-pnpm test
-```
-
-### Linting
-
-Check code style:
-```bash
-pnpm run lint
-```
-
 ## Contributing
 
-1. Fork the repository
-2. Create your feature branch: `git checkout -b feature/my-new-feature`
-3. Commit your changes: `git commit -am 'Add some feature'`
-4. Push to the branch: `git push origin feature/my-new-feature`
-5. Submit a pull request
+See our [Development Guide](docs/development.md) for details on:
+- Setting up the development environment
+- Running tests
+- Code style guidelines
+- Contribution workflow
 
 ## License
 
 Apache-2.0 - see [LICENSE](LICENSE) for details.
 
-## Related
+## Related Projects
 
 - [Model Context Protocol (MCP) Specification](https://modelcontextprotocol.io)
 - [Podman Desktop](https://podman-desktop.io)
