@@ -1,60 +1,63 @@
-import { vi, beforeEach } from 'vitest';
-import '@testing-library/jest-dom';
+import { jest } from '@jest/globals';
 
 // Consolidated mock for @podman-desktop/api
 const mockPodmanDesktopApi = {
   provider: {
-    createProvider: vi.fn().mockReturnValue({
+    createProvider: jest.fn().mockReturnValue({
       name: 'MCP Server Manager',
       id: 'mcp-server-manager',
       status: 'ready',
-      updateStatus: vi.fn(),
-      dispose: vi.fn()
+      updateStatus: jest.fn(),
+      dispose: jest.fn()
     })
   },
   window: {
-    showInformationMessage: vi.fn(),
-    showErrorMessage: vi.fn(),
-    createStatusBarItem: vi.fn().mockReturnValue({
+    showInformationMessage: jest.fn(),
+    showErrorMessage: jest.fn(),
+    createStatusBarItem: jest.fn().mockReturnValue({
       text: '',
       command: '',
-      show: vi.fn(),
-      hide: vi.fn(),
-      dispose: vi.fn()
+      show: jest.fn(),
+      hide: jest.fn(),
+      dispose: jest.fn()
     }),
-    createWebviewPanel: vi.fn().mockReturnValue({
+    createWebviewPanel: jest.fn().mockReturnValue({
       webview: {
         html: '',
-        onDidReceiveMessage: vi.fn(),
-        postMessage: vi.fn()
+        onDidReceiveMessage: jest.fn(),
+        postMessage: jest.fn()
       },
-      dispose: vi.fn()
+      dispose: jest.fn()
     })
   },
   commands: {
-    registerCommand: vi.fn().mockReturnValue({
-      dispose: vi.fn()
+    registerCommand: jest.fn().mockReturnValue({
+      dispose: jest.fn()
     }),
-    executeCommand: vi.fn()
+    executeCommand: jest.fn()
   },
   workspace: {
-    getConfiguration: vi.fn().mockReturnValue({
-      get: vi.fn(),
-      update: vi.fn()
+    getConfiguration: jest.fn().mockReturnValue({
+      get: jest.fn(),
+      update: jest.fn()
     })
   }
 };
 
-vi.mock('@podman-desktop/api', () => mockPodmanDesktopApi);
+jest.mock('@podman-desktop/api', () => mockPodmanDesktopApi);
 
 // Mock child_process.exec and util.promisify functionality
-vi.mock('child_process', () => ({
-  exec: vi.fn()
+jest.mock('child_process', () => ({
+  exec: jest.fn()
+}));
+
+jest.mock('util', () => ({
+  promisify: jest.fn((fn) => fn)
 }));
 
 // Clear all mocks before each test to ensure a clean state
 beforeEach(() => {
-  vi.clearAllMocks();
+  jest.clearAllMocks();
 });
 
 export { mockPodmanDesktopApi }; 
