@@ -36,12 +36,20 @@ export class HttpSseTransportFactory implements TransportFactory {
   }
 }
 
-const transportRegistry = new class TransportRegistry {
+export class TransportRegistry {
+  private static instance: TransportRegistry;
   public factories = new Map<string, TransportFactory>();
 
-  constructor() {
+  private constructor() {
     this.factories.set('stdio', new StdioTransportFactory());
     this.factories.set('http-sse', new HttpSseTransportFactory());
+  }
+
+  public static getInstance(): TransportRegistry {
+    if (!TransportRegistry.instance) {
+      TransportRegistry.instance = new TransportRegistry();
+    }
+    return TransportRegistry.instance;
   }
 
   register(type: string, factory: TransportFactory): void {
@@ -55,6 +63,7 @@ const transportRegistry = new class TransportRegistry {
     }
     return factory.createTransport(config);
   }
-}();
+}
 
-export { transportRegistry }; 
+// Export the singleton instance
+export const transportRegistry = TransportRegistry.getInstance(); 
