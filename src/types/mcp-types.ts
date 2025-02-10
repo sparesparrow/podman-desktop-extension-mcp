@@ -83,8 +83,21 @@ export interface MCPServerStatus {
   resources?: number;
 }
 
+export enum MCPErrorCode {
+  INVALID_CONFIG = 'INVALID_CONFIG',
+  TRANSPORT_ERROR = 'TRANSPORT_ERROR',
+  HEALTH_CHECK_ERROR = 'HEALTH_CHECK_ERROR',
+  AUTHENTICATION_ERROR = 'AUTHENTICATION_ERROR',
+  AUTHORIZATION_ERROR = 'AUTHORIZATION_ERROR',
+  RESOURCE_LIMIT_ERROR = 'RESOURCE_LIMIT_ERROR',
+  CONTAINER_ERROR = 'CONTAINER_ERROR',
+  NETWORK_ERROR = 'NETWORK_ERROR',
+  PROTOCOL_ERROR = 'PROTOCOL_ERROR',
+  UNKNOWN_ERROR = 'UNKNOWN_ERROR'
+}
+
 export class MCPServerError extends Error {
-  constructor(message: string) {
+  constructor(message: string, public readonly code: MCPErrorCode = MCPErrorCode.UNKNOWN_ERROR) {
     super(message);
     this.name = 'MCPServerError';
   }
@@ -92,14 +105,14 @@ export class MCPServerError extends Error {
 
 export class MCPTransportError extends MCPServerError {
   constructor(message: string) {
-    super(message);
+    super(message, MCPErrorCode.TRANSPORT_ERROR);
     this.name = 'MCPTransportError';
   }
 }
 
 export class MCPHealthCheckError extends MCPServerError {
   constructor(message: string) {
-    super(message);
+    super(message, MCPErrorCode.HEALTH_CHECK_ERROR);
     this.name = 'MCPHealthCheckError';
   }
 } 

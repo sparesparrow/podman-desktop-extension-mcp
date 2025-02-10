@@ -48,35 +48,150 @@ This diagram shows the key classes and their interdependencies.
 ```mermaid
 %% Class Diagram for Key Components
 classDiagram
-    class MCPServerManager {
-      +startServer(config: MCPServerConfig): Promise<void>
-      +stopServer(name: string): Promise<void>
-      +getServerStatus(name: string): Promise<string>
-      +listServers(): Promise<string[]>
+    direction LR
+
+    class Extension {
+        +activate(context: ExtensionContext)
+        +deactivate()
     }
-    class MCPServerService {
-      +startServer(config: MCPServerConfig): Promise<void>
-      +stopServer(name: string): Promise<void>
-      +callServerTool(name: string, toolName: string, args: any): Promise<any>
+    class CommandRegistrar {
+        +registerCommands(context: ExtensionContext, serverManager: MCPServerManager)
+    }
+    class MCPServerManager {
+        <<interface>>
+        +startServer(config: MCPServerConfig): Promise<void>
+        +stopServer(serverName: string): Promise<void>
+        +listServers(): Promise<MCPServerStatus[]>
+        +getServerStatus(serverName: string): Promise<MCPServerStatus>
+        +listServerTools(serverName: string): Promise<any[]>
+        +callServerTool(serverName: string, toolName: string, args: any): Promise<any>
+        +listServerResources(serverName: string): Promise<any[]>
+        +readServerResource<T>(serverName: string, uri: string): Promise<T>
+        +listServerPrompts(serverName: string): Promise<any[]>
+        +getServerPrompt<T>(serverName: string, promptName: string): Promise<T>
+        +isServerConnected(serverName: string): boolean
+        +getConnectedServers(): string[]
+        +dispose(): void
+    }
+    class MCPServerServiceImpl {
+        +startServer(config: MCPServerConfig): Promise<void>
+        +stopServer(serverName: string): Promise<void>
+        +listServers(): Promise<MCPServerStatus[]>
+        +getServerStatus(serverName: string): Promise<MCPServerStatus>
+        +listServerTools(serverName: string): Promise<any[]>
+        +callServerTool(serverName: string, toolName: string, args: any): Promise<any>
+        +listServerResources(serverName: string): Promise<any[]>
+        +readServerResource<T>(serverName: string, uri: string): Promise<T>
+        +listServerPrompts(serverName: string): Promise<any[]>
+        +getServerPrompt<T>(serverName: string, promptName: string): Promise<T>
+        +isServerConnected(serverName: string): boolean
+        +getConnectedServers(): string[]
+        +dispose(): void
+    }
+    class HealthCheckService {
+        +checkHealth(config: MCPServerConfig): Promise<boolean>
+        -getCheckStrategy(config: MCPServerConfig): HealthCheckStrategy
+    }
+    class HealthCheckStrategy {
+        <<interface>>
+        +check(): Promise<boolean>
+    }
+    class HttpHealthCheck {
+        +check(): Promise<boolean>
+    }
+    class ExecHealthCheck {
+        +check(): Promise<boolean>
+    }
+    class PodmanService {
+        <<interface>>
+        +runContainer(config: MCPServerConfig): Promise<string>
+        +stopContainer(containerId: string): Promise<void>
+        +listContainers(labels?: Record<string, string>): Promise<any[]>
+        +getContainerStatus(containerId: string): Promise<string>
+    }
+    class PodmanServiceImpl {
+        +runContainer(config: MCPServerConfig): Promise<string>
+        +stopContainer(containerId: string): Promise<void>
+        +listContainers(labels?: Record<string, string>): Promise<any[]>
+        +getContainerStatus(containerId: string): Promise<string>
     }
     class MCPRouter {
-      +connectServer(config: MCPServerConfig): Promise<void>
-      +disconnectServer(name: string): Promise<void>
-      +listServerTools(name: string): Promise<any[]>
+        +connectServer(config: MCPServerConfig): Promise<void>
+        +disconnectServer(name: string): Promise<void>
+        +listServerTools(name: string): Promise<any[]>
+        +callServerTool(name: string, toolName: string, args: any): Promise<any>
+        +listServerResources(name: string): Promise<any[]>
+        +readServerResource<T>(name: string, uri: string): Promise<T>
+        +listServerPrompts(name: string): Promise<any[]>
+        +getServerPrompt(name: string, promptName: string): Promise<any>
+        +isServerConnected(name: string): boolean
+        +getConnectedServers(): string[]
+        +dispose(): void
+    }
+    class MCPClient {
+        <<interface>>
+        +connect(): Promise<void>
+        +disconnect(): Promise<void>
+        +send(message: any): Promise<void>
+        +receive(): Promise<any>
+        +listTools(): Promise<ToolDefinition[]>
+        +callTool(name: string, args: any): Promise<any>
+        +listResources(): Promise<string[]>
+        +readResource<T>(uri: string): Promise<T>
+        +listPrompts(): Promise<string[]>
+        +getPrompt<T>(name: string): Promise<T>
+        +isConnected(): boolean
     }
     class TypedMCPClient {
-      +connect(): Promise<void>
-      +disconnect(): Promise<void>
-      +listTools(): Promise<ToolDefinition[]>
-      +callTool(name: string, args: any): Promise<any>
+        +connect(): Promise<void>
+        +disconnect(): Promise<void>
+        +send(message: any): Promise<void>
+        +receive(): Promise<any>
+        +listTools(): Promise<ToolDefinition[]>
+        +callTool(name: string, args: any): Promise<any>
+        +listResources(): Promise<string[]>
+        +readResource<T>(uri: string): Promise<T>
+        +listPrompts(): Promise<string[]>
+        +getPrompt<T>(name: string): Promise<T>
+        +isConnected(): boolean
     }
-    class MCPClientFactory {
-      +createClient(config: MCPServerTransport): MCPClient
+    class Transport {
+        <<interface>>
+        +connect(): Promise<void>
+        +disconnect(): Promise<void>
+        +send(message: any): Promise<void>
+        +receive(): Promise<any>
     }
-    MCPServerManager --> MCPServerService : uses
-    MCPServerService --> MCPRouter : delegates to
-    MCPRouter --> TypedMCPClient : creates
-    MCPClientFactory --> TypedMCPClient : instantiates
+
+
+    Extension --|> CommandRegistrar : uses
+    Extension --|> MCPServerManager : uses
+    MCPServerServiceImpl --|> MCPServerManager : implements
+    MCPServerServiceImpl --|> HealthCheckService : uses
+    MCPServerServiceImpl --|> PodmanService : uses
+    MCPServerServiceImpl --|> MCPRouter : uses
+    HealthCheckService ..> HealthCheckStrategy : uses strategy
+    HttpHealthCheck --|> HealthCheckStrategy : implements
+    ExecHealthCheck --|> HealthCheckStrategy : implements
+    MCPServerServiceImpl --|> MCPClient : uses
+    TypedMCPClient --|> MCPClient : implements
+    TypedMCPClient --|> Transport : uses
+    MCPRouter --|> MCPClient : uses
+
+    style Extension fill:#f8f9fa,stroke:#ccc,stroke-width:1px
+    style CommandRegistrar fill:#f8f9fa,stroke:#ccc,stroke-width:1px
+    style MCPServerManager fill:#e0f7fa,stroke:#80deea,stroke-width:2px
+    style MCPServerServiceImpl fill:#f8f9fa,stroke:#ccc,stroke-width:1px
+    style HealthCheckService fill:#f8f9fa,stroke:#ccc,stroke-width:1px
+    style HealthCheckStrategy fill:#e0f7fa,stroke:#80deea,stroke-width:2px
+    style HttpHealthCheck fill:#f8f9fa,stroke:#ccc,stroke-width:1px
+    style ExecHealthCheck fill:#f8f9fa,stroke:#ccc,stroke-width:1px
+    style PodmanService fill:#e0f7fa,stroke:#80deea,stroke-width:2px
+    style PodmanServiceImpl fill:#f8f9fa,stroke:#ccc,stroke-width:1px
+    style MCPRouter fill:#f8f9fa,stroke:#ccc,stroke-width:1px
+    style MCPClient fill:#e0f7fa,stroke:#80deea,stroke-width:2px
+    style TypedMCPClient fill:#f8f9fa,stroke:#ccc,stroke-width:1px
+    style Transport fill:#e0f7fa,stroke:#80deea,stroke-width:2px
 ```
 
 ---

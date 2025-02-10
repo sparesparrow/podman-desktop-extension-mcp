@@ -1,51 +1,35 @@
 import { MCPServerConfig, MCPHealthCheckError } from '../types/mcp-types';
-import { exec } from 'child_process';
-import { promisify } from 'util';
-
-const execAsync = promisify(exec);
+import { HealthCheckStrategy } from './health-check-strategy';
+import { HttpHealthCheck } from './http-health-check';
+import { ExecHealthCheck } from './exec-health-check';
 
 export class HealthCheckService {
+  private strategies: Map<string, HealthCheckStrategy> = new Map();
+
+  constructor() {
+    this.registerStrategy('httpGet', new HttpHealthCheck());
+    this.registerStrategy('exec', new ExecHealthCheck());
+  }
+
+  registerStrategy(type: string, strategy: HealthCheckStrategy): void {
+    this.strategies.set(type, strategy);
+  }
+
   async checkHealth(config: MCPServerConfig): Promise<boolean> {
-    const strategy = this.getCheckStrategy(config);
-    if (!strategy) throw new MCPHealthCheckError('Unsupported check type');
-    return strategy.check();
-  }
-
-  private getCheckStrategy(config: MCPServerConfig) {
-    if (config.readinessProbe.httpGet) {
-      return new HttpHealthCheck(config);
-    }
-    if (config.readinessProbe.exec) {
-      return new ExecHealthCheck(config);
-    }
-    return null;
-  }
-}
-
-class HttpHealthCheck {
-  constructor(private config: MCPServerConfig) {}
-
-  async check(): Promise<boolean> {
-    const { path, port } = this.config.readinessProbe.httpGet!;
-    try {
-      const { stdout } = await execAsync(`curl -f http://localhost:${port}${path}`);
-      return stdout.trim().length > 0;
-    } catch (error) {
-      return false;
-    }
-  }
-}
-
-class ExecHealthCheck {
-  constructor(private config: MCPServerConfig) {}
-
-  async check(): Promise<boolean> {
-    const { command } = this.config.readinessProbe.exec!;
-    try {
-      await execAsync(command.join(' '));
+    if (!config.readinessProbe) {
       return true;
-    } catch (error) {
-      return false;
     }
+
+    const probeType = Object.keys(config.readinessProbe).find(key => key === 'httpGet' || key === 'exec');
+    if (!probeType) {
+      throw new MCPHealthCheckError('No valid health check probe type found');
+    }
+
+    const strategy = this.strategies.get(probeType);
+    if (!strategy) {
+      throw new MCPHealthCheckError(`Unsupported health check type: ${probeType}`);
+    }
+
+    return strategy.check(config);
   }
 } 
