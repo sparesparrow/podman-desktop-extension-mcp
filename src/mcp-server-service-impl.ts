@@ -1,10 +1,11 @@
 import * as extensionApi from '@podman-desktop/api';
 import { MCPServerManager } from './interfaces/mcp-server-manager';
-import { MCPServerConfig, MCPServerStatus, MCPServerError, MCPErrorCode } from './types/mcp-types';
+import { MCPServerConfig, MCPServerStatus, MCPServerError, MCPErrorCode, MCPServerTransport } from './types/mcp-types';
 import { MCPRouter } from './mcp-router';
 import { HealthCheckService } from './health/health-check.service';
 import { PodmanService } from './podman/podman-service';
 import { PodmanServiceImpl } from './podman/podman-service-impl';
+import { TransportAdapter } from './transport/transport-adapter';
 
 export class MCPServerServiceImpl implements MCPServerManager {
   private servers: Map<string, MCPServerStatus> = new Map();
@@ -13,55 +14,22 @@ export class MCPServerServiceImpl implements MCPServerManager {
   private router: MCPRouter;
   private healthCheck: HealthCheckService;
   private podmanService: PodmanService;
+  private transport: TransportAdapter;
 
-  constructor() {
+  constructor(transport: MCPServerTransport) {
     this.provider = extensionApi.provider.createProvider({
       name: 'MCP Server Manager',
       id: 'mcp-server-manager',
       status: 'ready',
       images: {
         icon: './resources/icon.png',
-        logo: './resources/icon.png'
+        logo: './resources/logo.png'
       }
     });
     this.router = new MCPRouter();
     this.healthCheck = new HealthCheckService();
-    this.podmanService = new PodmanServiceImpl();
-  }
-
-  private async startHealthCheck(name: string, config: MCPServerConfig): Promise<void> {
-    if (!config.readinessProbe) return;
-
-    const {
-      initialDelaySeconds = 0,
-      periodSeconds = 10,
-      failureThreshold = 3
-    } = config.readinessProbe;
-
-    // Wait for initial delay
-    await new Promise(resolve => setTimeout(resolve, initialDelaySeconds * 1000));
-
-    let failures = 0;
-    const interval = setInterval(async () => {
-      const isReady = await this.healthCheck.checkHealth(config);
-      
-      if (!isReady) {
-        failures++;
-        if (failures >= failureThreshold) {
-          this.provider.updateStatus('error');
-          extensionApi.window.showErrorMessage(
-            `Server ${name} failed readiness check ${failures} times`
-          );
-          clearInterval(interval);
-          this.healthChecks.delete(name);
-        }
-      } else {
-        failures = 0;
-        this.provider.updateStatus('ready');
-      }
-    }, periodSeconds * 1000);
-
-    this.healthChecks.set(name, interval);
+    this.transport = new TransportAdapter(transport);
+    this.podmanService = new PodmanServiceImpl(this.transport);
   }
 
   async startServer(config: MCPServerConfig): Promise<void> {
@@ -84,7 +52,7 @@ export class MCPServerServiceImpl implements MCPServerManager {
       const serverStatus: MCPServerStatus = {
         name: config.name,
         containerStatus: 'running',
-        port: config.transport.type === 'http-sse' ? config.transport.port : undefined,
+        port: config.transport.port,
         tools: 0,
         resources: 0
       };
@@ -93,13 +61,6 @@ export class MCPServerServiceImpl implements MCPServerManager {
       // Start health checking if configured
       if (config.readinessProbe) {
         await this.startHealthCheck(config.name, config);
-        const isReady = await this.healthCheck.checkHealth(config);
-        if (!isReady) {
-          throw new MCPServerError(
-            'Server failed initial readiness check',
-            MCPErrorCode.HEALTH_CHECK_ERROR
-          );
-        }
       }
 
       // Connect to the MCP server
@@ -151,30 +112,24 @@ export class MCPServerServiceImpl implements MCPServerManager {
     }
   }
 
-  async getServerStatus(name: string): Promise<MCPServerStatus> {
-    try {
-      const containerStatus = await this.podmanService.getContainerStatus(name);
-      return {
-        name,
-        containerStatus,
-        port: this.servers.get(name)?.port,
-        tools: this.servers.get(name)?.tools,
-        resources: this.servers.get(name)?.resources
-      };
-    } catch (error) {
-      return {
-        name,
-        containerStatus: 'stopped'
-      };
-    }
-  }
-
   async listServers(): Promise<MCPServerStatus[]> {
     try {
-      const names = await this.podmanService.listContainers({ 'io.podman-desktop.extension': 'true' });
-      const statuses = await Promise.all(names.map(name => this.getServerStatus(name)));
+      const containerNames = await this.podmanService.listContainers();
+      const statuses = await Promise.all(
+        containerNames.map(async (name) => {
+          const status = this.servers.get(name) || {
+            name,
+            containerStatus: await this.podmanService.getContainerStatus(name),
+            port: undefined,
+            tools: 0,
+            resources: 0
+          };
+          return status;
+        })
+      );
       return statuses;
     } catch (error) {
+      console.error('Failed to list servers:', error);
       return [];
     }
   }
@@ -223,5 +178,61 @@ export class MCPServerServiceImpl implements MCPServerManager {
     
     // Cleanup resources
     this.provider.dispose();
+  }
+
+  private async startHealthCheck(name: string, config: MCPServerConfig): Promise<void> {
+    if (!config.readinessProbe) return;
+
+    const {
+      initialDelaySeconds = 0,
+      periodSeconds = 10,
+      failureThreshold = 3
+    } = config.readinessProbe;
+
+    // Wait for initial delay
+    await new Promise(resolve => setTimeout(resolve, initialDelaySeconds * 1000));
+
+    let failures = 0;
+    const interval = setInterval(async () => {
+      const isReady = await this.healthCheck.checkHealth(config);
+      
+      if (!isReady) {
+        failures++;
+        if (failures >= failureThreshold) {
+          this.provider.updateStatus('error');
+          extensionApi.window.showErrorMessage(
+            `Server ${name} failed readiness check ${failures} times`
+          );
+          clearInterval(interval);
+          this.healthChecks.delete(name);
+        }
+      } else {
+        failures = 0;
+        this.provider.updateStatus('ready');
+      }
+    }, periodSeconds * 1000);
+
+    this.healthChecks.set(name, interval);
+  }
+
+  async getServerStatus(name: string): Promise<MCPServerStatus> {
+    try {
+      const containerStatus = await this.podmanService.getContainerStatus(name);
+      return {
+        name,
+        containerStatus,
+        port: this.servers.get(name)?.port,
+        tools: this.servers.get(name)?.tools || 0,
+        resources: this.servers.get(name)?.resources || 0
+      };
+    } catch (error) {
+      return {
+        name,
+        containerStatus: 'stopped',
+        port: undefined,
+        tools: 0,
+        resources: 0
+      };
+    }
   }
 } 

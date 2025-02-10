@@ -21,12 +21,12 @@ export interface MCPServerStdioTransport extends MCPServerTransportBase {
   args?: string[];
 }
 
-export interface MCPServerHttpTransport extends MCPServerTransportBase {
+export interface MCPServerHttpSseTransport extends MCPServerTransportBase {
   type: 'http-sse';
   port: number;
 }
 
-export type MCPServerTransport = MCPServerStdioTransport | MCPServerHttpTransport;
+export type MCPServerTransport = MCPServerHttpSseTransport | MCPServerStdioTransport;
 
 export interface MCPServerReadinessProbe {
   initialDelaySeconds: number;

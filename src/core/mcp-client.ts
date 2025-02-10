@@ -116,4 +116,6 @@ export class MCPClientFactory {
   static createClient(config: MCPServerTransport): MCPClient {
     return new TypedMCPClient(config);
   }
-} 
+}
+
+// Remove unused interfaces and classes since we're using the transport from transport-factory 

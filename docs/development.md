@@ -1,155 +1,146 @@
 # Development Guide
 
-This guide provides detailed information for developers who want to contribute to the MCP Server Manager extension.
+## Overview
 
-## Development Environment
+This extension is built using TypeScript and implements the Model Context Protocol (MCP) specification. It provides a bridge between Podman Desktop and MCP servers, enabling secure container-based deployment and management.
 
-### Prerequisites
+## Prerequisites
 
-- Node.js >= 16.x
+- Node.js >= 20.x
 - pnpm >= 8.x
 - Podman Desktop >= 1.10.0
-- Git
-- A code editor (VS Code recommended)
-
-### Setup
-
-1. **Clone and Install**
-   ```bash
-   git clone https://github.com/sparesparrow/podman-desktop-extension-mcp.git
-   cd podman-desktop-extension-mcp
-   pnpm install
-   ```
-
-2. **Development Commands**
-   ```bash
-   # Build the extension
-   pnpm run build
-   
-   # Watch for changes
-   pnpm run watch
-   
-   # Run tests
-   pnpm test
-   
-   # Lint code
-   pnpm run lint
-   
-   # Format code
-   pnpm run format
-   ```
+- TypeScript knowledge
+- Understanding of MCP specification
 
 ## Project Structure
 
 ```
-podman-desktop-extension-mcp/
-├── src/
-│   ├── core/           # Core MCP client implementation
-│   ├── health/         # Health check services
-│   ├── settings/       # Extension settings management
-│   ├── types/         # TypeScript type definitions
-│   ├── ui/            # React components
-│   └── transport/     # Communication layer
-├── docs/              # Documentation
-├── tests/            # Test files
-└── scripts/          # Build and utility scripts
+src/
+├── core/           # Core MCP client implementation
+├── interfaces/     # TypeScript interfaces
+├── podman/         # Podman service implementation
+├── transport/      # MCP transport layer
+├── types/         # TypeScript type definitions
+└── extension.ts   # Extension entry point
+```
+
+## Transport Layer
+
+The transport layer implements the MCP specification's transport requirements:
+
+### Supported Transports
+
+- HTTP SSE (Server-Sent Events)
+  - Default transport for web-based communication
+  - Supports bi-directional communication
+  - Configurable host, port, and TLS settings
+
+- STDIO
+  - Used for direct process communication
+  - Supports command execution with arguments
+  - Useful for local development
+
+### Transport Configuration
+
+```typescript
+interface MCPServerTransport {
+  type: 'http-sse' | 'stdio';
+  host?: string;
+  port?: number;
+  basePath?: string;
+  tls?: {
+    enabled: boolean;
+    cert?: string;
+    key?: string;
+    ca?: string;
+  };
+}
 ```
 
 ## Development Workflow
 
-1. **Create Feature Branch**
-   ```bash
-   git checkout -b feature/my-new-feature
-   ```
+1. Setup Development Environment:
+```bash
+# Install dependencies
+pnpm install
 
-2. **Development Process**
-   - Write tests first (TDD approach)
-   - Implement the feature
-   - Ensure all tests pass
-   - Update documentation
-
-3. **Code Style**
-   - Follow TypeScript best practices
-   - Use ESLint and Prettier
-   - Follow SOLID principles
-   - Write meaningful commit messages
-
-4. **Testing**
-   - Unit tests with Vitest
-   - Integration tests
-   - E2E tests with Playwright
-   - Test coverage requirements
-
-## Testing Guidelines
-
-### Unit Tests
-
-```typescript
-import { describe, it, expect } from 'vitest';
-import { MCPClient } from '../src/core/mcp-client';
-
-describe('MCPClient', () => {
-  it('should connect to server', async () => {
-    const client = new MCPClient({
-      port: 3000,
-      host: 'localhost'
-    });
-    
-    const result = await client.connect();
-    expect(result).toBe(true);
-  });
-});
+# Start development build
+pnpm run dev
 ```
 
-### Integration Tests
+2. Testing:
+```bash
+# Run unit tests
+pnpm test
 
-- Test server-client communication
-- Verify container lifecycle
-- Check resource management
-- Validate security features
+# Type checking
+pnpm run type-check
+
+# Linting
+pnpm run lint
+```
+
+3. Building:
+```bash
+# Production build
+pnpm run build
+```
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Run tests and type checking
+5. Submit a pull request
+
+### Code Style
+
+- Follow TypeScript best practices
+- Use strict type checking
+- Document public APIs
+- Write unit tests for new features
+
+### Testing
+
+- Write unit tests for new functionality
+- Ensure existing tests pass
+- Test both success and error cases
+- Test transport layer implementations
 
 ## Debugging
 
-1. **Extension Debugging**
-   - Use VS Code debugger
-   - Enable extension logs
-   - Monitor container logs
+1. Enable Debug Logging:
+```typescript
+console.debug('Detailed message');
+```
 
-2. **Common Issues**
-   - Port conflicts
-   - Permission issues
-   - Resource constraints
+2. Use VS Code Debug Configuration:
+```json
+{
+  "type": "node",
+  "request": "launch",
+  "name": "Debug Extension",
+  "program": "${workspaceFolder}/src/extension.ts",
+  "outFiles": ["${workspaceFolder}/dist/**/*.js"]
+}
+```
 
-## Building for Production
+## Release Process
 
-1. **Production Build**
-   ```bash
-   pnpm run build:prod
-   ```
+1. Update version in package.json
+2. Run full test suite
+3. Create release branch
+4. Build and verify extension
+5. Create GitHub release
+6. Publish to registries
 
-2. **Release Process**
-   - Version bump
-   - Changelog update
-   - Tag release
-   - Build documentation
+## Documentation
 
-## Contributing Guidelines
-
-1. **Pull Request Process**
-   - Create feature branch
-   - Write tests
-   - Update documentation
-   - Submit PR with description
-
-2. **Code Review**
-   - Follow review checklist
-   - Address feedback
-   - Maintain clean history
-
-3. **Documentation**
-   - Update relevant docs
-   - Add inline comments
-   - Update changelog
+- Keep README.md updated
+- Document new features
+- Update API documentation
+- Maintain changelog
 
 ## Additional Resources
 

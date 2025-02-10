@@ -1,4 +1,4 @@
-# MCP Server Manager Extension for Podman Desktop (podman-desktop-extension-mcp)
+# MCP Server Manager Extension for Podman Desktop
 
 A comprehensive Podman Desktop extension that implements the Model Context Protocol (MCP), providing Linux users and others with a complete alternative to Claude Desktop. This extension enables secure deployment and management of MCP servers using Podman's container infrastructure.
 
@@ -38,7 +38,7 @@ For detailed architecture and design information, see our [Technical Documentati
 - Podman Desktop >= 1.10.0
 - Podman installed and configured
 - For building from source:
-  - Node.js >= 16.x
+  - Node.js >= 20.x
   - pnpm >= 8.x
 
 ### Installation
@@ -47,12 +47,7 @@ There are two ways to install the extension:
 
 #### Method 1: Install from Container Registry (Recommended)
 
-1. Ensure you're logged into GitHub Container Registry:
-```bash
-podman login ghcr.io
-```
-
-2. Install the extension in Podman Desktop:
+1. Install the extension in Podman Desktop:
    - Open Podman Desktop
    - Go to Settings > Extensions
    - Click "Install from Container Image"
@@ -96,12 +91,27 @@ Access these commands through Podman Desktop's command palette (Ctrl/Cmd + Shift
 {
   name: 'mcp-server',
   image: 'ghcr.io/sparesparrow/podman-desktop-extension-mcp:latest',
-  port: 3000,
+  version: 'latest',
+  transport: {
+    type: 'http-sse',
+    port: 3000,
+    host: 'localhost',
+    basePath: '/api/v1'
+  },
   capabilities: {
     resources: true,
     tools: true,
     prompts: true,
     logging: true
+  },
+  readinessProbe: {
+    initialDelaySeconds: 5,
+    periodSeconds: 10,
+    failureThreshold: 3,
+    httpGet: {
+      path: '/health',
+      port: 3000
+    }
   }
 }
 ```
@@ -122,6 +132,6 @@ Apache-2.0 - see [LICENSE](LICENSE) for details.
 
 - [Model Context Protocol (MCP) Specification](https://modelcontextprotocol.io)
 - [Podman Desktop](https://podman-desktop.io)
-- [MCP Servers Repository](https://github.com/sparesparrow/podman-desktop-extension-mcp)
+- [MCP TypeScript SDK](https://github.com/modelcontextprotocol/typescript-sdk)
 
 ![MCP Server Manager Extension](/images/5c0c0e9fe4def0b584c04d37849941da55e5e71c-2401x1000.webp)
