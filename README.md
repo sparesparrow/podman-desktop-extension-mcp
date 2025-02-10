@@ -37,10 +37,28 @@ For detailed architecture and design information, see our [Technical Documentati
 
 - Podman Desktop >= 1.10.0
 - Podman installed and configured
-- Node.js >= 16.x
-- pnpm >= 8.x
+- For building from source:
+  - Node.js >= 16.x
+  - pnpm >= 8.x
 
 ### Installation
+
+There are two ways to install the extension:
+
+#### Method 1: Install from Container Registry (Recommended)
+
+1. Ensure you're logged into GitHub Container Registry:
+```bash
+podman login ghcr.io
+```
+
+2. Install the extension in Podman Desktop:
+   - Open Podman Desktop
+   - Go to Settings > Extensions
+   - Click "Install from Container Image"
+   - Enter: `ghcr.io/sparesparrow/podman-desktop-extension-mcp:latest`
+
+#### Method 2: Build and Install from Source
 
 1. Clone and setup:
 ```bash
