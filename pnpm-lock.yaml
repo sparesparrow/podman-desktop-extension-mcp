@@ -26,8 +26,8 @@ devDependencies:
     specifier: ^0.5.10
     version: 0.5.16(tailwindcss@3.4.17)
   '@testing-library/svelte':
-    specifier: ^5.2.6
-    version: 5.2.6(svelte@4.2.19)(vite@5.0.12)(vitest@1.6.1)
+    specifier: ^5.2.7
+    version: 5.2.7(svelte@4.2.19)(vite@5.0.12)(vitest@1.6.1)
   '@tsconfig/svelte':
     specifier: ^5.0.4
     version: 5.0.4
@@ -795,8 +795,8 @@ packages:
       pretty-format: 27.5.1
     dev: true
 
-  /@testing-library/svelte@5.2.6(svelte@4.2.19)(vite@5.0.12)(vitest@1.6.1):
-    resolution: {integrity: sha512-1Y8cEg/BtV4J6g9irkY0ksz+ueDFYLiikjTLiqvQPkOUeDzR4gg2zECBf8yrOrCy3e2TAOYMcaysFa0bQMyk1w==}
+  /@testing-library/svelte@5.2.7(svelte@4.2.19)(vite@5.0.12)(vitest@1.6.1):
+    resolution: {integrity: sha512-aGhUaFmEXEVost4QOsbHUUbHLwi7ZZRRxAHFDO2Cmr0BZD3/3+XvaYEPq70Rdw0NRNjdqZHdARBEcrCOkPuAqw==}
     engines: {node: '>= 10'}
     peerDependencies:
       svelte: ^3 || ^4 || ^5 || ^5.0.0-next.0
