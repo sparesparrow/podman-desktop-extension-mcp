@@ -17,8 +17,8 @@ devDependencies:
     specifier: ^0.7.13
     version: 0.7.13
   '@podman-desktop/api':
-    specifier: 1.16.1
-    version: 1.16.1
+    specifier: 1.16.2
+    version: 1.16.2
   '@sveltejs/vite-plugin-svelte':
     specifier: ^3.0.1
     version: 3.0.1(svelte@4.2.19)(vite@5.0.12)
@@ -530,8 +530,8 @@ packages:
     dev: true
     optional: true
 
-  /@podman-desktop/api@1.16.1:
-    resolution: {integrity: sha512-x0z5AE9RVeie2lF75vbVa4fnj0/GXellth0xIHWWyuhoskhPHlqaXcvfjFH9pKcU1BubadErRaZy36ntQqE26A==}
+  /@podman-desktop/api@1.16.2:
+    resolution: {integrity: sha512-DwcMvKFSBrmlPuXaFssHhlhBruFfVH5261R9TxyjeLWjEUwefggK72TrP5ndZPl3N25il202fQazkecRE94Qhw==}
     dev: true
 
   /@protobufjs/aspromise@1.1.2:

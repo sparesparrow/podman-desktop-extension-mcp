@@ -33,7 +33,7 @@
   "devDependencies": {
     "@grpc/grpc-js": "^1.12.6",
     "@grpc/proto-loader": "^0.7.13",
-    "@podman-desktop/api": "1.16.1",
+    "@podman-desktop/api": "1.16.2",
     "@sveltejs/vite-plugin-svelte": "^3.0.1",
     "@testing-library/svelte": "^5.2.6",
     "@tsconfig/svelte": "^5.0.4",
