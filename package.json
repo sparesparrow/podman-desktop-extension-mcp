@@ -34,7 +34,7 @@
     "@grpc/grpc-js": "^1.12.6",
     "@grpc/proto-loader": "^0.7.13",
     "@podman-desktop/api": "1.16.1",
-    "@sveltejs/vite-plugin-svelte": "^3.0.1",
+    "@sveltejs/vite-plugin-svelte": "^3.1.2",
     "@testing-library/svelte": "^5.2.6",
     "@tsconfig/svelte": "^5.0.4",
     "@types/jest": "^29.5.14",
