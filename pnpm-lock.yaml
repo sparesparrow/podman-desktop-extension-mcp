@@ -11,8 +11,8 @@ dependencies:
 
 devDependencies:
   '@grpc/grpc-js':
-    specifier: ^1.12.6
-    version: 1.12.6
+    specifier: ^1.13.2
+    version: 1.13.2
   '@grpc/proto-loader':
     specifier: ^0.7.13
     version: 0.7.13
@@ -378,8 +378,8 @@ packages:
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
     dev: true
 
-  /@grpc/grpc-js@1.12.6:
-    resolution: {integrity: sha512-JXUj6PI0oqqzTGvKtzOkxtpsyPRNsrmhh41TtIz/zEB6J+AUiZZ0dxWzcMwO9Ns5rmSPuMdghlTbUuqIM48d3Q==}
+  /@grpc/grpc-js@1.13.2:
+    resolution: {integrity: sha512-nnR5nmL6lxF8YBqb6gWvEgLdLh/Fn+kvAdX5hUOnt48sNSb0riz/93ASd2E5gvanPA41X6Yp25bIfGRp1SMb2g==}
     engines: {node: '>=12.10.0'}
     dependencies:
       '@grpc/proto-loader': 0.7.13
