@@ -236,14 +236,10 @@ export class MCPServerManager {
   }
 
   async getServerStatus(name: string): Promise<string> {
-    try {
-      const { stdout } = await execAsync(
-        `podman ps -a --filter name=${name} --format "{{.Status}}"`
-      );
-      return stdout.trim() || 'not found';
-    } catch (error) {
-      throw error;
-    }
+    const { stdout } = await execAsync(
+      `podman ps -a --filter name=${name} --format "{{.Status}}"`
+    );
+    return stdout.trim() || 'not found';
   }
 
   async listServers(): Promise<string[]> {

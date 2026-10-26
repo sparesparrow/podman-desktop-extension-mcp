@@ -15,12 +15,15 @@ export interface TransportEvents {
   protocolNegotiated: (capabilities: MCPProtocolCapabilities) => void;
 }
 
+// Typed EventEmitter: the interface narrows on/once/emit to TransportEvents for the class below.
+// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 export declare interface BaseTransport {
   on<E extends keyof TransportEvents>(event: E, listener: TransportEvents[E]): this;
   once<E extends keyof TransportEvents>(event: E, listener: TransportEvents[E]): this;
   emit<E extends keyof TransportEvents>(event: E, ...args: Parameters<TransportEvents[E]>): boolean;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 export abstract class BaseTransport extends EventEmitter {
   protected isConnected = false;
   protected negotiatedCapabilities?: MCPProtocolCapabilities;

@@ -1,4 +1,4 @@
-import { jest } from '@jest/globals';
+import { vi } from 'vitest';
 
 export type ProviderStatus =
   | 'not-installed'
@@ -28,46 +28,46 @@ export interface Provider {
 }
 
 export const provider = {
-  createProvider: jest.fn().mockReturnValue({
+  createProvider: vi.fn().mockReturnValue({
     name: 'MCP Server Manager',
     id: 'mcp-server-manager',
     status: 'ready',
-    updateStatus: jest.fn(),
-    dispose: jest.fn()
+    updateStatus: vi.fn(),
+    dispose: vi.fn()
   })
 };
 
 export const window = {
-  showInformationMessage: jest.fn(),
-  showErrorMessage: jest.fn(),
-  createStatusBarItem: jest.fn().mockReturnValue({
+  showInformationMessage: vi.fn(),
+  showErrorMessage: vi.fn(),
+  createStatusBarItem: vi.fn().mockReturnValue({
     text: '',
     command: '',
-    show: jest.fn(),
-    hide: jest.fn(),
-    dispose: jest.fn()
+    show: vi.fn(),
+    hide: vi.fn(),
+    dispose: vi.fn()
   }),
-  createWebviewPanel: jest.fn().mockReturnValue({
+  createWebviewPanel: vi.fn().mockReturnValue({
     webview: {
       html: '',
-      onDidReceiveMessage: jest.fn(),
-      postMessage: jest.fn()
+      onDidReceiveMessage: vi.fn(),
+      postMessage: vi.fn()
     },
-    dispose: jest.fn()
+    dispose: vi.fn()
   })
 };
 
 export const commands = {
-  registerCommand: jest.fn().mockReturnValue({
-    dispose: jest.fn()
+  registerCommand: vi.fn().mockReturnValue({
+    dispose: vi.fn()
   }),
-  executeCommand: jest.fn()
+  executeCommand: vi.fn()
 };
 
 export const workspace = {
-  getConfiguration: jest.fn().mockReturnValue({
-    get: jest.fn(),
-    update: jest.fn()
+  getConfiguration: vi.fn().mockReturnValue({
+    get: vi.fn(),
+    update: vi.fn()
   })
 };
 

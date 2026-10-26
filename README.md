@@ -96,10 +96,13 @@ not every item in them is implemented yet.
 ## Development
 
 ```bash
+pnpm run type-check  # tsc --noEmit
 pnpm run build       # extension (tsc) and frontend (Vite)
+pnpm test            # Vitest unit tests in src/__tests__
 pnpm run lint
-npx vitest run       # unit tests in src/__tests__
 ```
+
+CI (`.github/workflows/pr-check.yaml`, `main.yaml`) runs the same four steps with pnpm 8.
 
 ## License
 

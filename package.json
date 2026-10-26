@@ -14,9 +14,11 @@
     "build": "tsc --noEmitOnError false && vite build",
     "build:extension": "tsc --noEmitOnError false",
     "build:frontend": "vite build",
+    "type-check": "tsc --noEmit",
     "watch": "vite",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "vitest run"
   },
   "contributes": {
     "id": "podman-desktop-extension-mcp",
