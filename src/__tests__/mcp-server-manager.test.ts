@@ -1,123 +1,134 @@
-import { MCPServerService } from '../mcp-server-service';
-import { MCPServerConfig } from '../types/mcp-types';
-import { jest } from '@jest/globals';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import type { MCPServerConfig } from '../types/mcp-types';
 
-// Mock modules
-jest.mock('@podman-desktop/api', () => ({
-  provider: {
-    createProvider: jest.fn().mockReturnValue({
-      updateStatus: jest.fn(),
-      dispose: jest.fn(),
-      name: 'MCP Server Manager',
-      id: 'mcp-server-manager',
-      status: 'ready'
-    })
-  },
+// vi.mock factories are hoisted above the imports, so the mocks they share
+// with the tests must be created with vi.hoisted.
+const mocks = vi.hoisted(() => {
+  const provider = { updateStatus: vi.fn(), dispose: vi.fn() };
+  return {
+    provider,
+    createProvider: vi.fn(() => provider),
+    showInformationMessage: vi.fn(),
+    showErrorMessage: vi.fn(),
+    execAsync: vi.fn(),
+    connectServer: vi.fn(),
+    disconnectServer: vi.fn(),
+    isServerConnected: vi.fn(() => false),
+  };
+});
+
+vi.mock('@podman-desktop/api', () => ({
+  provider: { createProvider: mocks.createProvider },
   window: {
-    showInformationMessage: jest.fn(),
-    showErrorMessage: jest.fn()
-  }
+    showInformationMessage: mocks.showInformationMessage,
+    showErrorMessage: mocks.showErrorMessage,
+  },
 }));
 
-const mockExec = jest.fn();
+// The service wraps child_process.exec with util.promisify at import time.
+vi.mock('util', () => ({ promisify: () => mocks.execAsync }));
 
-jest.mock('child_process', () => ({
-  exec: jest.fn()
+vi.mock('../mcp-router', () => ({
+  MCPRouter: vi.fn(() => ({
+    connectServer: mocks.connectServer,
+    disconnectServer: mocks.disconnectServer,
+    isServerConnected: mocks.isServerConnected,
+    dispose: vi.fn(),
+  })),
 }));
 
-jest.mock('util', () => ({
-  promisify: () => mockExec
+vi.mock('../health/health-check.service', () => ({
+  HealthCheckService: vi.fn(() => ({ checkHealth: vi.fn(async () => true) })),
 }));
 
-// Get the mocked instances
-const mockProvider = jest.mocked(require('@podman-desktop/api').provider.createProvider());
+import { MCPServerService } from '../mcp-server-service';
+
+const config: MCPServerConfig = {
+  name: 'test-server',
+  image: 'test-image',
+  version: 'latest',
+  transport: { type: 'http-sse', port: 3000 },
+  capabilities: { resources: true, tools: true, prompts: true, logging: true },
+};
 
 describe('MCPServerService', () => {
   let service: MCPServerService;
-  let mockConfig: MCPServerConfig;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
+    mocks.isServerConnected.mockReturnValue(false);
     service = new MCPServerService();
-    mockConfig = {
-      name: 'test-server',
-      image: 'test-image',
-      version: 'latest',
-      transport: {
-        type: 'http-sse',
-        port: 3000
-      },
-      capabilities: {
-        resources: true,
-        tools: true,
-        prompts: true,
-        logging: true
-      },
-      readinessProbe: {
-        initialDelaySeconds: 5,
-        periodSeconds: 10,
-        failureThreshold: 3,
-        httpGet: {
-          path: '/health',
-          port: 3000
-        }
-      }
-    };
   });
 
   describe('startServer', () => {
-    it('should start a server successfully', async () => {
-      mockExec.mockResolvedValueOnce({ stdout: 'container-id', stderr: '' });
+    it('runs the container, connects to it and reports ready', async () => {
+      mocks.execAsync
+        .mockResolvedValueOnce({ stdout: '', stderr: '' }) // podman ps: no existing container
+        .mockResolvedValueOnce({ stdout: 'container-id\n', stderr: '' }); // podman run
 
-      await service.startServer(mockConfig);
+      await service.startServer(config);
 
-      expect(mockExec).toHaveBeenCalled();
-      expect(mockProvider.updateStatus).toHaveBeenCalledWith('ready');
+      const runCommand = mocks.execAsync.mock.calls[1][0] as string;
+      expect(runCommand).toContain('podman run -d --name test-server');
+      expect(runCommand).toContain('-p 3000:3000');
+      expect(runCommand).toContain('-e MCP_TOOLS=true');
+      expect(runCommand).toContain('test-image:latest');
+      expect(mocks.connectServer).toHaveBeenCalledWith(config);
+      expect(mocks.provider.updateStatus).toHaveBeenLastCalledWith('ready');
+      expect(mocks.showInformationMessage).toHaveBeenCalledWith(expect.stringContaining('container-id'));
     });
 
-    it('should handle errors when starting a server', async () => {
-      mockExec.mockRejectedValueOnce(new Error('Failed to start'));
+    it('refuses to start a server whose container already exists', async () => {
+      mocks.execAsync.mockResolvedValueOnce({ stdout: 'test-server\n', stderr: '' });
 
-      await expect(service.startServer(mockConfig)).rejects.toThrow();
-      expect(mockProvider.updateStatus).toHaveBeenCalledWith('error');
+      await expect(service.startServer(config)).rejects.toThrow('already exists');
+      expect(mocks.execAsync).toHaveBeenCalledTimes(1);
+      expect(mocks.provider.updateStatus).toHaveBeenLastCalledWith('error');
+    });
+
+    it('reports an error when podman fails', async () => {
+      mocks.execAsync.mockRejectedValueOnce(new Error('podman not found'));
+
+      await expect(service.startServer(config)).rejects.toThrow('podman not found');
+      expect(mocks.provider.updateStatus).toHaveBeenLastCalledWith('error');
     });
   });
 
   describe('stopServer', () => {
-    it('should stop a server successfully', async () => {
-      mockExec.mockResolvedValueOnce({ stdout: '', stderr: '' });
+    it('stops and removes the container', async () => {
+      mocks.execAsync.mockResolvedValue({ stdout: '', stderr: '' });
 
       await service.stopServer('test-server');
 
-      expect(mockExec).toHaveBeenCalled();
-      expect(mockProvider.updateStatus).toHaveBeenCalledWith('stopped');
+      expect(mocks.execAsync).toHaveBeenCalledWith('podman stop test-server');
+      expect(mocks.execAsync).toHaveBeenCalledWith('podman rm test-server');
+      expect(mocks.provider.updateStatus).toHaveBeenLastCalledWith('stopped');
     });
 
-    it('should handle errors when stopping a server', async () => {
-      mockExec.mockRejectedValueOnce(new Error('Failed to stop'));
+    it('reports an error when stopping fails', async () => {
+      mocks.execAsync.mockRejectedValueOnce(new Error('Failed to stop'));
 
-      await expect(service.stopServer('test-server')).rejects.toThrow();
-      expect(mockProvider.updateStatus).toHaveBeenCalledWith('error');
+      await expect(service.stopServer('test-server')).rejects.toThrow('Failed to stop');
+      expect(mocks.provider.updateStatus).toHaveBeenLastCalledWith('error');
     });
   });
 
   describe('listServers', () => {
-    it('should list servers successfully', async () => {
-      mockExec.mockResolvedValueOnce({ stdout: 'server1\nserver2', stderr: '' });
+    it('returns the status of every extension container', async () => {
+      mocks.execAsync
+        .mockResolvedValueOnce({ stdout: 'server1\nserver2\n', stderr: '' })
+        .mockResolvedValue({ stdout: 'running\n', stderr: '' });
 
       const result = await service.listServers();
 
-      expect(result).toHaveLength(2);
-      expect(mockExec).toHaveBeenCalled();
+      expect(result.map(s => s.name)).toEqual(['server1', 'server2']);
+      expect(result.every(s => s.containerStatus === 'running')).toBe(true);
     });
 
-    it('should handle errors when listing servers', async () => {
-      mockExec.mockRejectedValueOnce(new Error('Failed to list'));
+    it('returns an empty list when podman fails', async () => {
+      mocks.execAsync.mockRejectedValueOnce(new Error('Failed to list'));
 
-      const result = await service.listServers();
-
-      expect(result).toEqual([]);
-      expect(mockExec).toHaveBeenCalled();
+      expect(await service.listServers()).toEqual([]);
     });
   });
-}); 
+});
