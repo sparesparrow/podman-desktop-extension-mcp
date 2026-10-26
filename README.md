@@ -1,61 +1,71 @@
-# MCP Server Manager Extension for Podman Desktop
+# MCP Server Manager for Podman Desktop
 
-A comprehensive Podman Desktop extension that implements the Model Context Protocol (MCP), providing Linux users and others with a complete alternative to Claude Desktop. This extension enables secure deployment and management of MCP servers using Podman's container infrastructure.
+A [Podman Desktop](https://podman-desktop.io) extension that runs
+[Model Context Protocol](https://modelcontextprotocol.io) servers as Podman containers and routes calls
+between them, so one place can start an MCP server, wait until it is healthy, connect to it and use its
+tools, resources and prompts. It came out of wanting an MCP host on Linux that keeps each server in its own
+rootless container instead of running it directly on the desktop.
 
-## Overview
+> **Status: early prototype (0.0.1).** The container lifecycle, health checks, transport layer and router
+> are implemented, with a first unit test for the server manager; the UI, tests and several protocol
+> features are still in progress — see
+> [`TODO.txt`](TODO.txt) for the plan and what is done. There is no published release yet; build it from
+> source as below.
 
-The MCP Server Manager extension leverages Podman Desktop's extension capabilities to deliver:
+## What it does
 
-- Full MCP client and server implementation
-- Secure container-based deployment
-- Integrated AI assistant capabilities
-- Native Linux support with enhanced security through Podman's rootless architecture
+- **Runs MCP servers in containers.** The server manager pulls the configured image and runs one container
+  per server through Podman, with optional CPU and memory limits, then waits for a readiness probe before
+  connecting.
+- **Checks health.** HTTP and `exec` health-check strategies (`src/health/`) with initial delay, period and
+  failure threshold, as in a Kubernetes readiness probe.
+- **Speaks several transports.** A transport registry (`src/transport/`) creates stdio, HTTP + SSE and
+  WebSocket clients behind one interface; a gRPC transport is stubbed. Optional TLS, compression and
+  keep-alive settings are part of the server configuration.
+- **Routes between servers.** `MCPRouter` keeps one MCP client per running server and forwards
+  `tools/list`, `tools/call`, `resources/list`, `resources/read`, `prompts/list` and `prompts/get` to the
+  right one by name, so tools from several containers can be used side by side.
+- **Typed errors.** An `MCPErrorCode` enum and error classes carry failures up to the UI instead of
+  swallowing them.
 
-For detailed architecture and design information, see our [Technical Documentation](docs/diagrams.md).
+## Commands
 
-## Core Features
+Registered by `src/command-registrar.ts` and available from the command palette:
 
-- **Server Management**
-  - Start/stop MCP servers with configurable options
-  - Monitor server health and status
-  - List and manage multiple server instances
-  
-- **MCP Client Integration**
-  - Direct AI assistant interaction
-  - File system integration for data management
-  - Secure API key handling
-  
-- **Security Features**
-  - Rootless container execution
-  - Resource isolation
-  - Access control enforcement
-  - Encrypted communication
+| Command ID | What it does |
+|---|---|
+| `mcp.startServer` | Start a server container from a configuration (defaults below) and connect to it |
+| `mcp.stopServer` | Disconnect and stop a server by name |
+| `mcp.listServerTools` / `mcp.callServerTool` | List a server's tools / call one with arguments |
+| `mcp.listServerResources` / `mcp.readServerResource` | List a server's resources / read one by URI |
+| `mcp.listServerPrompts` / `mcp.getServerPrompt` | List a server's prompts / fetch one |
 
-## Quick Start
+A status-bar item opens the MCP menu, and the extension contributes an **MCP Server Manager** view.
 
-### Requirements
+### Default server configuration
 
-- Podman Desktop >= 1.10.0
-- Podman installed and configured
-- For building from source:
-  - Node.js >= 20.x
-  - pnpm >= 8.x
+```typescript
+{
+  name: 'mcp-server',
+  image: 'ghcr.io/sparesparrow/podman-desktop-extension-mcp',
+  version: 'latest',
+  transport: { type: 'http-sse', port: 3000 },
+  capabilities: { resources: true, tools: true, prompts: true, logging: true },
+  readinessProbe: {
+    initialDelaySeconds: 5,
+    periodSeconds: 10,
+    failureThreshold: 3,
+    httpGet: { path: '/health', port: 3000 }
+  }
+}
+```
 
-### Installation
+Point `image` at any MCP server image that exposes the chosen transport.
 
-There are two ways to install the extension:
+## Build and install from source
 
-#### Method 1: Install from Container Registry (Recommended)
+Requirements: Podman Desktop ≥ 1.10.0 with Podman configured, Node.js ≥ 20 and pnpm.
 
-1. Install the extension in Podman Desktop:
-   - Open Podman Desktop
-   - Go to Settings > Extensions
-   - Click "Install from Container Image"
-   - Enter: `ghcr.io/sparesparrow/podman-desktop-extension-mcp:latest`
-
-#### Method 2: Build and Install from Source
-
-1. Clone and setup:
 ```bash
 git clone https://github.com/sparesparrow/podman-desktop-extension-mcp.git
 cd podman-desktop-extension-mcp
@@ -63,75 +73,34 @@ pnpm install
 pnpm run build
 ```
 
-2. Install in Podman Desktop:
-   - Open Podman Desktop
-   - Go to Settings > Extensions
-   - Click "Install from Directory"
-   - Select the built extension directory
+Then in Podman Desktop: **Settings → Extensions → Install from directory**, and select this folder.
+`Containerfile` packages the built extension as an OCI image for **Install from container image**; the
+`publish.yaml` workflow pushes it to GitHub Container Registry once a release is tagged.
 
-## Documentation
+## Layout
 
-- [Architecture and Design](docs/diagrams.md) - Detailed technical architecture
-- [Security Guide](docs/security.md) - Security features and best practices
-- [Development Guide](docs/development.md) - Guide for contributors
-- [API Reference](docs/api.md) - API documentation
+| Path | What it is |
+|---|---|
+| `src/extension.ts`, `src/command-registrar.ts` | Activation and command registration |
+| `src/mcp-server-manager.ts`, `src/mcp-server-service*.ts` | Server lifecycle: create, start, stop, track |
+| `src/podman/` | Podman container operations |
+| `src/health/` | HTTP and exec readiness / health checks |
+| `src/transport/`, `src/protocol/` | Transport factories and adapter, protocol negotiation |
+| `src/core/mcp-client.ts`, `src/mcp-router.ts` | MCP client and the multi-server router |
+| `src/frontend/` | Svelte UI: server list and chat interface (work in progress) |
+| `docs/` | [Architecture diagrams](docs/diagrams.md), [security notes](docs/security.md), [development guide](docs/development.md), [API reference](docs/api.md) |
 
-## Usage
+The security notes describe the intended design (rootless containers, resource isolation, key storage);
+not every item in them is implemented yet.
 
-Access these commands through Podman Desktop's command palette (Ctrl/Cmd + Shift + P):
+## Development
 
-- `MCP: Start Server` - Deploy new MCP server
-- `MCP: Stop Server` - Stop running server
-- `MCP: Get Status` - Check server status
-- `MCP: List Servers` - View all servers
-
-### Default Configuration
-
-```typescript
-{
-  name: 'mcp-server',
-  image: 'ghcr.io/sparesparrow/podman-desktop-extension-mcp:latest',
-  version: 'latest',
-  transport: {
-    type: 'http-sse',
-    port: 3000,
-    host: 'localhost',
-    basePath: '/api/v1'
-  },
-  capabilities: {
-    resources: true,
-    tools: true,
-    prompts: true,
-    logging: true
-  },
-  readinessProbe: {
-    initialDelaySeconds: 5,
-    periodSeconds: 10,
-    failureThreshold: 3,
-    httpGet: {
-      path: '/health',
-      port: 3000
-    }
-  }
-}
+```bash
+pnpm run build       # extension (tsc) and frontend (Vite)
+pnpm run lint
+npx vitest run       # unit tests in src/__tests__
 ```
-
-## Contributing
-
-See our [Development Guide](docs/development.md) for details on:
-- Setting up the development environment
-- Running tests
-- Code style guidelines
-- Contribution workflow
 
 ## License
 
-Apache-2.0 - see [LICENSE](LICENSE) for details.
-
-## Related Projects
-
-- [Model Context Protocol (MCP) Specification](https://modelcontextprotocol.io)
-- [Podman Desktop](https://podman-desktop.io)
-- [MCP TypeScript SDK](https://github.com/modelcontextprotocol/typescript-sdk)
-
-![MCP Server Manager Extension](/images/5c0c0e9fe4def0b584c04d37849941da55e5e71c-2401x1000.webp)
+Apache-2.0 — see [LICENSE](LICENSE).
